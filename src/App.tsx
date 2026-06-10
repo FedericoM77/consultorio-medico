@@ -36,11 +36,12 @@ function AppContent() {
         marginTop: '48px',
         padding: '28px 32px',
         minHeight: 'calc(100vh - 48px)',
+        maxWidth: 'calc(100vw - 52px)',
       }}>
-        <div style={{ marginBottom: '20px' }}>
+        <div style={{ marginBottom: '24px' }}>
           <h1 style={{
-            margin: 0, fontSize: '22px', fontWeight: 500,
-            color: 'var(--text-primary)', letterSpacing: '-0.01em',
+            margin: 0, fontSize: '20px', fontWeight: 600,
+            color: 'var(--text-primary)', letterSpacing: '-0.03em',
           }}>
             {titulos[modulo]}
           </h1>

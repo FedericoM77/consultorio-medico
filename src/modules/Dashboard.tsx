@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Calendar, DollarSign, Users, Clock, MessageCircle, AlertCircle, FileText } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { Calendar, DollarSign, Users, Clock, MessageCircle, AlertCircle, FileText, ArrowUpRight, ChevronRight } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { pacientes, turnos, cobros } from '../data/mockData';
 import { Badge } from '../components/ui/Badge';
 import { Avatar } from '../components/ui/Avatar';
 import { Drawer } from '../components/ui/Drawer';
+import { Button } from '../components/ui/Button';
 import { Turno } from '../types';
 
 const barData = [
@@ -18,66 +19,92 @@ const barData = [
 const turnosHoy = turnos.filter(t => t.fecha === '2026-06-11');
 const cobrosHoy = cobros.filter(c => c.fecha === '2026-06-11');
 const totalCobradoHoy = cobrosHoy.filter(c => c.estado === 'cobrado').reduce((s, c) => s + c.monto, 0);
+const pendientesHoy = cobrosHoy.filter(c => c.estado === 'pendiente').length;
+const confirmados = turnosHoy.filter(t => t.estado === 'confirmado').length;
+const pendientesTurno = turnosHoy.filter(t => t.estado === 'pendiente').length;
+
+const statusBorderColor: Record<string, string> = {
+  confirmado: 'var(--accent-green)',
+  'en-consultorio': 'var(--accent-yellow)',
+  pendiente: 'var(--accent-blue)',
+  cancelado: 'var(--accent-orange)',
+  atendido: 'var(--text-muted)',
+};
 
 export function Dashboard() {
   const [drawerTurno, setDrawerTurno] = useState<Turno | null>(null);
-
   const getPaciente = (id: string) => pacientes.find(p => p.id === id);
-
   const drawerPaciente = drawerTurno ? getPaciente(drawerTurno.pacienteId) : null;
 
-  const pendientesHoy = cobrosHoy.filter(c => c.estado === 'pendiente').length;
-  const confirmados = turnosHoy.filter(t => t.estado === 'confirmado').length;
-  const pendientesTurno = turnosHoy.filter(t => t.estado === 'pendiente').length;
-
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
       {/* Metric cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px' }}>
         <MetricCard
-          icon={<Calendar size={18} />}
+          icon={<Calendar size={16} />}
           label="Turnos hoy"
           value={String(turnosHoy.length)}
           sub={`${confirmados} confirmados · ${pendientesTurno} pendientes`}
-          color="var(--accent-yellow)"
+          accentColor="var(--accent-blue)"
+          glowColor="var(--accent-blue-glow)"
+          trend="+2 vs ayer"
         />
         <MetricCard
-          icon={<DollarSign size={18} />}
+          icon={<DollarSign size={16} />}
           label="Cobrado hoy"
           value={`$${totalCobradoHoy.toLocaleString('es-AR')}`}
           sub={`${pendientesHoy} pendientes de cobro`}
-          color="var(--accent-green)"
+          accentColor="var(--accent-green)"
+          glowColor="var(--accent-green-glow)"
+          trend="+12% vs sem."
         />
         <MetricCard
-          icon={<Users size={18} />}
+          icon={<Users size={16} />}
           label="Nuevos este mes"
           value="18"
-          sub="pacientes"
-          color="var(--accent-blue)"
+          sub="pacientes nuevos"
+          accentColor="var(--accent-purple)"
+          glowColor="rgba(155,93,229,0.15)"
+          trend="+6 vs mes ant."
         />
         <MetricCard
-          icon={<Clock size={18} />}
+          icon={<Clock size={16} />}
           label="Próximo turno"
           value="10:30"
-          sub="en 12 min — Juan Ramírez"
-          color="var(--accent-orange)"
+          sub="Juan Ramírez · en 12 min"
+          accentColor="var(--accent-yellow)"
+          glowColor="var(--accent-yellow-glow)"
         />
       </div>
 
       {/* Content row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: '14px' }}>
+
         {/* Agenda del día */}
-        <div style={{
-          background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-          borderRadius: '12px', padding: '24px',
-        }}>
-          <h2 style={{ margin: '0 0 16px', fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>
-            Agenda del día — miércoles 11/06
-          </h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        <div style={cardStyle}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+            <div>
+              <h2 style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+                Agenda del día
+              </h2>
+              <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Miércoles 11 de junio</span>
+            </div>
+            <span style={{
+              fontSize: '11px', fontWeight: 600, color: 'var(--accent-yellow)',
+              background: 'var(--accent-yellow-glow)',
+              border: '1px solid rgba(212,224,0,0.2)',
+              borderRadius: '6px', padding: '3px 10px',
+            }}>
+              {turnosHoy.length} turnos
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             {turnosHoy.map(turno => {
               const p = getPaciente(turno.pacienteId);
               if (!p) return null;
+              const borderColor = statusBorderColor[turno.estado] || 'var(--border)';
               return (
                 <button
                   key={turno.id}
@@ -87,31 +114,47 @@ export function Dashboard() {
                     gridTemplateColumns: '52px 36px 1fr auto',
                     alignItems: 'center',
                     gap: '12px',
-                    padding: '10px 12px',
+                    padding: '10px 14px',
                     background: 'var(--bg-card-deep)',
                     border: '1px solid var(--border-subtle)',
-                    borderRadius: '8px',
+                    borderLeft: `3px solid ${borderColor}`,
+                    borderRadius: '10px',
                     cursor: 'pointer',
                     textAlign: 'left',
                     fontFamily: 'inherit',
-                    transition: 'border-color 150ms ease',
+                    transition: 'all 150ms ease',
+                    width: '100%',
                   }}
-                  onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--border)')}
-                  onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border-subtle)')}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = 'var(--bg-hover)';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = 'var(--shadow-card)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = 'var(--bg-card-deep)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 >
-                  <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}>
+                  <span style={{
+                    fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)',
+                    fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em',
+                  }}>
                     {turno.hora}
                   </span>
                   <Avatar nombre={`${p.nombre} ${p.apellido}`} size={32} />
                   <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-primary)', marginBottom: '2px' }}>
+                    <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-primary)', marginBottom: '1px', letterSpacing: '-0.01em' }}>
                       {p.nombre} {p.apellido}
                     </div>
                     <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
-                      {turno.motivo} · {turno.obraSocial}
+                      {turno.motivo} · <span style={{ color: 'var(--text-muted)' }}>{turno.obraSocial}</span>
                     </div>
                   </div>
-                  <Badge variant={turno.estado} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Badge variant={turno.estado} />
+                    <ChevronRight size={14} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+                  </div>
                 </button>
               );
             })}
@@ -119,15 +162,18 @@ export function Dashboard() {
         </div>
 
         {/* Panel derecho */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {/* Cobros del día */}
-          <div style={{
-            background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-            borderRadius: '12px', padding: '20px',
-          }}>
-            <h3 style={{ margin: '0 0 12px', fontSize: '13px', fontWeight: 500, color: 'var(--text-secondary)' }}>
-              COBROS DEL DÍA
-            </h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+
+          {/* Cobros */}
+          <div style={cardStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+              <h3 style={{ margin: 0, fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                Cobros del día
+              </h3>
+              <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--accent-green)', fontVariantNumeric: 'tabular-nums' }}>
+                ${totalCobradoHoy.toLocaleString('es-AR')}
+              </span>
+            </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {cobrosHoy.slice(0, 5).map(c => {
                 const p = getPaciente(c.pacienteId);
@@ -137,7 +183,7 @@ export function Dashboard() {
                       {p?.nombre} {p?.apellido}
                     </span>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}>
+                      <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}>
                         ${c.monto.toLocaleString('es-AR')}
                       </span>
                       <Badge variant={c.estado} />
@@ -149,51 +195,61 @@ export function Dashboard() {
           </div>
 
           {/* Alertas */}
-          <div style={{
-            background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-            borderRadius: '12px', padding: '20px',
-          }}>
-            <h3 style={{ margin: '0 0 12px', fontSize: '13px', fontWeight: 500, color: 'var(--text-secondary)' }}>
-              ALERTAS
+          <div style={cardStyle}>
+            <h3 style={{ margin: '0 0 12px', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              Alertas
             </h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <AlertItem icon={<MessageCircle size={14} />} color="var(--accent-green)" text="WhatsApp enviado a 7 pacientes" />
-              <AlertItem icon={<AlertCircle size={14} />} color="var(--accent-orange)" text="1 cancelación recibida — Roberto Sánchez" />
-              <AlertItem icon={<FileText size={14} />} color="var(--accent-blue)" text="2 recetas crónicas por renovar" />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <AlertItem icon={<MessageCircle size={14} />} color="var(--accent-green)" bg="var(--accent-green-glow)" text="WhatsApp enviado a 7 pacientes" />
+              <AlertItem icon={<AlertCircle size={14} />} color="var(--accent-orange)" bg="var(--accent-orange-glow)" text="Cancelación — Roberto Sánchez" />
+              <AlertItem icon={<FileText size={14} />} color="var(--accent-blue)" bg="var(--accent-blue-glow)" text="2 recetas crónicas por renovar" />
             </div>
           </div>
 
-          {/* Mini gráfico */}
-          <div style={{
-            background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-            borderRadius: '12px', padding: '20px',
-          }}>
-            <h3 style={{ margin: '0 0 12px', fontSize: '13px', fontWeight: 500, color: 'var(--text-secondary)' }}>
-              TURNOS / SEMANA
-            </h3>
+          {/* Chart */}
+          <div style={cardStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+              <h3 style={{ margin: 0, fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                Turnos / semana
+              </h3>
+              <span style={{ fontSize: '11px', color: 'var(--accent-green)', fontWeight: 600 }}>
+                <ArrowUpRight size={12} style={{ display: 'inline', verticalAlign: 'middle' }} /> +8%
+              </span>
+            </div>
             <ResponsiveContainer width="100%" height={80}>
-              <BarChart data={barData} margin={{ top: 0, right: 0, left: -32, bottom: 0 }}>
-                <XAxis dataKey="dia" tick={{ fontSize: 11, fill: 'var(--text-secondary)' }} axisLine={false} tickLine={false} />
+              <BarChart data={barData} margin={{ top: 0, right: 0, left: -28, bottom: 0 }} barSize={14}>
+                <XAxis dataKey="dia" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
                 <YAxis hide />
                 <Tooltip
-                  cursor={{ fill: 'var(--border-subtle)' }}
-                  contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '6px', fontSize: '12px' }}
+                  cursor={{ fill: 'var(--border-subtle)', radius: 4 }}
+                  contentStyle={{
+                    background: 'var(--bg-card)', border: '1px solid var(--border)',
+                    borderRadius: '8px', fontSize: '12px', boxShadow: 'var(--shadow-elevated)',
+                    color: 'var(--text-primary)',
+                  }}
                 />
-                <Bar dataKey="turnos" fill="var(--accent-yellow)" radius={[3, 3, 0, 0]} isAnimationActive={false} />
+                <Bar dataKey="turnos" radius={[4, 4, 0, 0]} isAnimationActive={false}>
+                  {barData.map((entry, i) => (
+                    <Cell
+                      key={i}
+                      fill={entry.dia === 'Mié' ? 'var(--accent-yellow)' : 'var(--border)'}
+                    />
+                  ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
       </div>
 
-      {/* Drawer de turno */}
+      {/* Drawer detalle */}
       <Drawer open={!!drawerTurno} onClose={() => setDrawerTurno(null)} title="Detalle de turno">
         {drawerTurno && drawerPaciente && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <Avatar nombre={`${drawerPaciente.nombre} ${drawerPaciente.apellido}`} size={48} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '16px', background: 'var(--bg-card-deep)', borderRadius: '12px' }}>
+              <Avatar nombre={`${drawerPaciente.nombre} ${drawerPaciente.apellido}`} size={52} />
               <div>
-                <div style={{ fontSize: '16px', fontWeight: 500, color: 'var(--text-primary)' }}>
+                <div style={{ fontSize: '17px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: '4px' }}>
                   {drawerPaciente.nombre} {drawerPaciente.apellido}
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
@@ -202,37 +258,21 @@ export function Dashboard() {
               </div>
             </div>
 
-            <InfoRow label="Motivo" value={drawerTurno.motivo} />
-            <InfoRow label="Estado" value={<Badge variant={drawerTurno.estado} />} />
-            <InfoRow label="Duración" value={`${drawerTurno.duracion} min`} />
-            <InfoRow label="DNI" value={drawerPaciente.dni} />
-            <InfoRow label="Teléfono" value={drawerPaciente.telefono} />
-            {drawerPaciente.antecedentes.length > 0 && (
-              <InfoRow label="Antecedentes" value={drawerPaciente.antecedentes.join(', ')} />
-            )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <InfoRow label="Motivo" value={drawerTurno.motivo} />
+              <InfoRow label="Estado" value={<Badge variant={drawerTurno.estado} />} />
+              <InfoRow label="Duración" value={`${drawerTurno.duracion} min`} />
+              <InfoRow label="DNI" value={drawerPaciente.dni} />
+              <InfoRow label="Teléfono" value={drawerPaciente.telefono} />
+              {drawerPaciente.antecedentes.length > 0 && (
+                <InfoRow label="Antecedentes" value={drawerPaciente.antecedentes.join(', ')} />
+              )}
+            </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
-              <button style={{
-                background: 'var(--accent-yellow)', color: 'var(--bg-canvas)',
-                border: 'none', borderRadius: '4px', padding: '10px',
-                fontSize: '13px', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
-              }}>
-                Iniciar consulta
-              </button>
-              <button style={{
-                background: 'transparent', color: 'var(--text-primary)',
-                border: '1px solid var(--border)', borderRadius: '4px', padding: '10px',
-                fontSize: '13px', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
-              }}>
-                Reprogramar
-              </button>
-              <button style={{
-                background: 'transparent', color: 'var(--accent-orange)',
-                border: '1px solid var(--accent-orange)', borderRadius: '4px', padding: '10px',
-                fontSize: '13px', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
-              }}>
-                Cancelar turno
-              </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingTop: '8px', borderTop: '1px solid var(--border-subtle)' }}>
+              <Button variant="primary" style={{ justifyContent: 'center' }}>Iniciar consulta</Button>
+              <Button variant="secondary" style={{ justifyContent: 'center' }}>Reprogramar</Button>
+              <Button variant="destructive" style={{ justifyContent: 'center' }}>Cancelar turno</Button>
             </div>
           </div>
         )}
@@ -241,42 +281,83 @@ export function Dashboard() {
   );
 }
 
-function MetricCard({ icon, label, value, sub, color }: {
-  icon: React.ReactNode; label: string; value: string; sub: string; color: string;
+/* ── subcomponents ─────────────────────────────────────── */
+
+function MetricCard({ icon, label, value, sub, accentColor, glowColor, trend }: {
+  icon: React.ReactNode; label: string; value: string; sub: string;
+  accentColor: string; glowColor: string; trend?: string;
 }) {
   return (
     <div style={{
-      background: 'var(--bg-card-deep)', border: '1px solid var(--border-subtle)',
-      borderRadius: '12px', padding: '20px',
+      background: 'var(--bg-card)',
+      border: '1px solid var(--border-subtle)',
+      borderTop: `2px solid ${accentColor}`,
+      borderRadius: '12px',
+      padding: '18px 20px',
+      boxShadow: 'var(--shadow-card)',
+      display: 'flex', flexDirection: 'column', gap: '0',
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', color }}>
-        {icon}
-        <span style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          {label}
-        </span>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '14px' }}>
+        <div style={{
+          width: 34, height: 34, borderRadius: '9px',
+          background: glowColor,
+          border: `1px solid ${accentColor}30`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: accentColor,
+          flexShrink: 0,
+        }}>
+          {icon}
+        </div>
+        {trend && (
+          <span style={{ fontSize: '11px', color: 'var(--accent-green)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '2px' }}>
+            <ArrowUpRight size={11} /> {trend}
+          </span>
+        )}
       </div>
-      <div style={{ fontSize: '28px', fontWeight: 500, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums', marginBottom: '4px' }}>
+
+      <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '6px' }}>
+        {label}
+      </div>
+      <div style={{ fontSize: '28px', fontWeight: 600, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.03em', lineHeight: 1, marginBottom: '6px' }}>
         {value}
       </div>
-      <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{sub}</div>
+      <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{sub}</div>
     </div>
   );
 }
 
-function AlertItem({ icon, color, text }: { icon: React.ReactNode; color: string; text: string }) {
+function AlertItem({ icon, color, bg, text }: { icon: React.ReactNode; color: string; bg: string; text: string }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-      <span style={{ color }}>{icon}</span>
-      <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{text}</span>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div style={{
+        width: 26, height: 26, borderRadius: '7px',
+        background: bg, color,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        flexShrink: 0,
+      }}>
+        {icon}
+      </div>
+      <span style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.4 }}>{text}</span>
     </div>
   );
 }
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
+    <div style={{
+      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+      padding: '8px 0', borderBottom: '1px solid var(--border-subtle)',
+    }}>
       <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{label}</span>
       <span style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 500 }}>{value}</span>
     </div>
   );
 }
+
+const cardStyle: React.CSSProperties = {
+  background: 'var(--bg-card)',
+  border: '1px solid var(--border-subtle)',
+  borderRadius: '14px',
+  padding: '20px',
+  boxShadow: 'var(--shadow-card)',
+};
