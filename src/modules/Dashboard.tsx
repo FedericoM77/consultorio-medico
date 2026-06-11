@@ -24,10 +24,10 @@ const confirmados = turnosHoy.filter(t => t.estado === 'confirmado').length;
 const pendientesTurno = turnosHoy.filter(t => t.estado === 'pendiente').length;
 
 const statusBorderColor: Record<string, string> = {
-  confirmado: 'var(--accent-green)',
-  'en-consultorio': 'var(--accent-yellow)',
-  pendiente: 'var(--accent-blue)',
-  cancelado: 'var(--accent-orange)',
+  confirmado: 'var(--green)',
+  'en-consultorio': 'var(--blue)',
+  pendiente: 'var(--amber)',
+  cancelado: 'var(--red)',
   atendido: 'var(--text-muted)',
 };
 
@@ -42,39 +42,39 @@ export function Dashboard() {
       {/* Metric cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px' }}>
         <MetricCard
-          icon={<Calendar size={16} />}
+          icon={<Calendar size={15} />}
           label="Turnos hoy"
           value={String(turnosHoy.length)}
           sub={`${confirmados} confirmados · ${pendientesTurno} pendientes`}
-          accentColor="var(--accent-blue)"
-          glowColor="var(--accent-blue-glow)"
+          color="var(--blue)"
+          colorBg="var(--blue-bg)"
           trend="+2 vs ayer"
         />
         <MetricCard
-          icon={<DollarSign size={16} />}
+          icon={<DollarSign size={15} />}
           label="Cobrado hoy"
           value={`$${totalCobradoHoy.toLocaleString('es-AR')}`}
           sub={`${pendientesHoy} pendientes de cobro`}
-          accentColor="var(--accent-green)"
-          glowColor="var(--accent-green-glow)"
+          color="var(--green)"
+          colorBg="var(--green-bg)"
           trend="+12% vs sem."
         />
         <MetricCard
-          icon={<Users size={16} />}
+          icon={<Users size={15} />}
           label="Nuevos este mes"
           value="18"
           sub="pacientes nuevos"
-          accentColor="var(--accent-purple)"
-          glowColor="rgba(155,93,229,0.15)"
+          color="var(--purple)"
+          colorBg="var(--purple-bg)"
           trend="+6 vs mes ant."
         />
         <MetricCard
-          icon={<Clock size={16} />}
+          icon={<Clock size={15} />}
           label="Próximo turno"
           value="10:30"
           sub="Juan Ramírez · en 12 min"
-          accentColor="var(--accent-yellow)"
-          glowColor="var(--accent-yellow-glow)"
+          color="var(--amber)"
+          colorBg="var(--amber-bg)"
         />
       </div>
 
@@ -82,7 +82,7 @@ export function Dashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: '14px' }}>
 
         {/* Agenda del día */}
-        <div style={cardStyle}>
+        <div style={card}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
             <div>
               <h2 style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
@@ -91,16 +91,16 @@ export function Dashboard() {
               <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Miércoles 11 de junio</span>
             </div>
             <span style={{
-              fontSize: '11px', fontWeight: 600, color: 'var(--accent-yellow)',
-              background: 'var(--accent-yellow-glow)',
-              border: '1px solid rgba(212,224,0,0.2)',
+              fontSize: '11px', fontWeight: 600, color: 'var(--blue)',
+              background: 'var(--blue-bg)',
+              border: '1px solid var(--blue-border)',
               borderRadius: '6px', padding: '3px 10px',
             }}>
               {turnosHoy.length} turnos
             </span>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
             {turnosHoy.map(turno => {
               const p = getPaciente(turno.pacienteId);
               if (!p) return null;
@@ -111,29 +111,28 @@ export function Dashboard() {
                   onClick={() => setDrawerTurno(turno)}
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: '52px 36px 1fr auto',
+                    gridTemplateColumns: '52px 34px 1fr auto',
                     alignItems: 'center',
                     gap: '12px',
                     padding: '10px 14px',
-                    background: 'var(--bg-card-deep)',
+                    background: 'var(--surface-raised)',
                     border: '1px solid var(--border-subtle)',
-                    borderLeft: `3px solid ${borderColor}`,
-                    borderRadius: '10px',
+                    borderLeft: `2px solid ${borderColor}`,
+                    borderRadius: '8px',
                     cursor: 'pointer',
                     textAlign: 'left',
                     fontFamily: 'inherit',
-                    transition: 'all 150ms ease',
+                    transition: 'all 140ms ease',
                     width: '100%',
                   }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.background = 'var(--bg-hover)';
-                    e.currentTarget.style.transform = 'translateY(-1px)';
-                    e.currentTarget.style.boxShadow = 'var(--shadow-card)';
+                    e.currentTarget.style.background = 'var(--surface-overlay)';
+                    e.currentTarget.style.borderColor = borderColor;
                   }}
                   onMouseLeave={e => {
-                    e.currentTarget.style.background = 'var(--bg-card-deep)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.background = 'var(--surface-raised)';
+                    e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                    (e.currentTarget.style as any).borderLeftColor = borderColor;
                   }}
                 >
                   <span style={{
@@ -142,7 +141,7 @@ export function Dashboard() {
                   }}>
                     {turno.hora}
                   </span>
-                  <Avatar nombre={`${p.nombre} ${p.apellido}`} size={32} />
+                  <Avatar nombre={`${p.nombre} ${p.apellido}`} size={30} />
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-primary)', marginBottom: '1px', letterSpacing: '-0.01em' }}>
                       {p.nombre} {p.apellido}
@@ -153,7 +152,7 @@ export function Dashboard() {
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <Badge variant={turno.estado} />
-                    <ChevronRight size={14} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+                    <ChevronRight size={13} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
                   </div>
                 </button>
               );
@@ -165,12 +164,10 @@ export function Dashboard() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
 
           {/* Cobros */}
-          <div style={cardStyle}>
+          <div style={card}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-              <h3 style={{ margin: 0, fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                Cobros del día
-              </h3>
-              <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--accent-green)', fontVariantNumeric: 'tabular-nums' }}>
+              <h3 style={sectionTitle}>Cobros del día</h3>
+              <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--green)', fontVariantNumeric: 'tabular-nums' }}>
                 ${totalCobradoHoy.toLocaleString('es-AR')}
               </span>
             </div>
@@ -195,25 +192,21 @@ export function Dashboard() {
           </div>
 
           {/* Alertas */}
-          <div style={cardStyle}>
-            <h3 style={{ margin: '0 0 12px', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-              Alertas
-            </h3>
+          <div style={card}>
+            <h3 style={{ ...sectionTitle, marginBottom: '12px' }}>Alertas</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <AlertItem icon={<MessageCircle size={14} />} color="var(--accent-green)" bg="var(--accent-green-glow)" text="WhatsApp enviado a 7 pacientes" />
-              <AlertItem icon={<AlertCircle size={14} />} color="var(--accent-orange)" bg="var(--accent-orange-glow)" text="Cancelación — Roberto Sánchez" />
-              <AlertItem icon={<FileText size={14} />} color="var(--accent-blue)" bg="var(--accent-blue-glow)" text="2 recetas crónicas por renovar" />
+              <AlertItem icon={<MessageCircle size={13} />} color="var(--green)" bg="var(--green-bg)" text="WhatsApp enviado a 7 pacientes" />
+              <AlertItem icon={<AlertCircle size={13} />} color="var(--red)" bg="var(--red-bg)" text="Cancelación — Roberto Sánchez" />
+              <AlertItem icon={<FileText size={13} />} color="var(--blue)" bg="var(--blue-bg)" text="2 recetas crónicas por renovar" />
             </div>
           </div>
 
           {/* Chart */}
-          <div style={cardStyle}>
+          <div style={card}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-              <h3 style={{ margin: 0, fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                Turnos / semana
-              </h3>
-              <span style={{ fontSize: '11px', color: 'var(--accent-green)', fontWeight: 600 }}>
-                <ArrowUpRight size={12} style={{ display: 'inline', verticalAlign: 'middle' }} /> +8%
+              <h3 style={sectionTitle}>Turnos / semana</h3>
+              <span style={{ fontSize: '11px', color: 'var(--green)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '2px' }}>
+                <ArrowUpRight size={11} /> +8%
               </span>
             </div>
             <ResponsiveContainer width="100%" height={80}>
@@ -223,8 +216,8 @@ export function Dashboard() {
                 <Tooltip
                   cursor={{ fill: 'var(--border-subtle)', radius: 4 }}
                   contentStyle={{
-                    background: 'var(--bg-card)', border: '1px solid var(--border)',
-                    borderRadius: '8px', fontSize: '12px', boxShadow: 'var(--shadow-elevated)',
+                    background: 'var(--surface)', border: '1px solid var(--border)',
+                    borderRadius: '8px', fontSize: '12px', boxShadow: 'var(--shadow-md)',
                     color: 'var(--text-primary)',
                   }}
                 />
@@ -232,7 +225,7 @@ export function Dashboard() {
                   {barData.map((entry, i) => (
                     <Cell
                       key={i}
-                      fill={entry.dia === 'Mié' ? 'var(--accent-yellow)' : 'var(--border)'}
+                      fill={entry.dia === 'Mié' ? 'var(--blue)' : 'var(--border)'}
                     />
                   ))}
                 </Bar>
@@ -246,10 +239,10 @@ export function Dashboard() {
       <Drawer open={!!drawerTurno} onClose={() => setDrawerTurno(null)} title="Detalle de turno">
         {drawerTurno && drawerPaciente && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '16px', background: 'var(--bg-card-deep)', borderRadius: '12px' }}>
-              <Avatar nombre={`${drawerPaciente.nombre} ${drawerPaciente.apellido}`} size={52} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '16px', background: 'var(--surface-raised)', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
+              <Avatar nombre={`${drawerPaciente.nombre} ${drawerPaciente.apellido}`} size={48} />
               <div>
-                <div style={{ fontSize: '17px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: '4px' }}>
+                <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: '3px' }}>
                   {drawerPaciente.nombre} {drawerPaciente.apellido}
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
@@ -258,7 +251,7 @@ export function Dashboard() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
               <InfoRow label="Motivo" value={drawerTurno.motivo} />
               <InfoRow label="Estado" value={<Badge variant={drawerTurno.estado} />} />
               <InfoRow label="Duración" value={`${drawerTurno.duracion} min`} />
@@ -283,42 +276,40 @@ export function Dashboard() {
 
 /* ── subcomponents ─────────────────────────────────────── */
 
-function MetricCard({ icon, label, value, sub, accentColor, glowColor, trend }: {
+function MetricCard({ icon, label, value, sub, color, colorBg, trend }: {
   icon: React.ReactNode; label: string; value: string; sub: string;
-  accentColor: string; glowColor: string; trend?: string;
+  color: string; colorBg: string; trend?: string;
 }) {
   return (
     <div style={{
-      background: 'var(--bg-card)',
-      border: '1px solid var(--border-subtle)',
-      borderTop: `2px solid ${accentColor}`,
-      borderRadius: '12px',
+      background: 'var(--surface)',
+      border: '1px solid var(--border)',
+      borderRadius: '10px',
       padding: '18px 20px',
-      boxShadow: 'var(--shadow-card)',
+      boxShadow: 'var(--shadow-sm)',
       display: 'flex', flexDirection: 'column', gap: '0',
     }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '14px' }}>
         <div style={{
-          width: 34, height: 34, borderRadius: '9px',
-          background: glowColor,
-          border: `1px solid ${accentColor}30`,
+          width: 32, height: 32, borderRadius: '8px',
+          background: colorBg,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: accentColor,
+          color: color,
           flexShrink: 0,
         }}>
           {icon}
         </div>
         {trend && (
-          <span style={{ fontSize: '11px', color: 'var(--accent-green)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '2px' }}>
+          <span style={{ fontSize: '11px', color: 'var(--green)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '2px' }}>
             <ArrowUpRight size={11} /> {trend}
           </span>
         )}
       </div>
 
-      <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '6px' }}>
+      <div style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '6px' }}>
         {label}
       </div>
-      <div style={{ fontSize: '28px', fontWeight: 600, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.03em', lineHeight: 1, marginBottom: '6px' }}>
+      <div style={{ fontSize: '26px', fontWeight: 600, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.03em', lineHeight: 1, marginBottom: '5px' }}>
         {value}
       </div>
       <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{sub}</div>
@@ -346,7 +337,7 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div style={{
       display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-      padding: '8px 0', borderBottom: '1px solid var(--border-subtle)',
+      padding: '9px 0', borderBottom: '1px solid var(--border-subtle)',
     }}>
       <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{label}</span>
       <span style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 500 }}>{value}</span>
@@ -354,10 +345,17 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
-const cardStyle: React.CSSProperties = {
-  background: 'var(--bg-card)',
-  border: '1px solid var(--border-subtle)',
-  borderRadius: '14px',
+const card: React.CSSProperties = {
+  background: 'var(--surface)',
+  border: '1px solid var(--border)',
+  borderRadius: '10px',
   padding: '20px',
-  boxShadow: 'var(--shadow-card)',
+  boxShadow: 'var(--shadow-sm)',
+};
+
+const sectionTitle: React.CSSProperties = {
+  margin: 0,
+  fontSize: '11px', fontWeight: 600,
+  color: 'var(--text-secondary)',
+  textTransform: 'uppercase', letterSpacing: '0.07em',
 };

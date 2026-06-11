@@ -37,9 +37,6 @@ export function Configuracion() {
   const [agendaForm, setAgendaForm] = useState({
     duracionDefault: '30',
     buffer: '5',
-    horarios: Object.fromEntries(
-      DIAS_SEMANA.map(d => [d, HORAS.filter((_, i) => i >= 0 && i <= 10)])
-    ),
   });
 
   const [notifForm, setNotifForm] = useState({
@@ -78,15 +75,15 @@ export function Configuracion() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '4px', borderBottom: '1px solid var(--border-subtle)' }}>
+      <div style={{ display: 'flex', gap: '0', borderBottom: '1px solid var(--border)' }}>
         {tabs.map(t => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
             style={{
-              padding: '10px 16px', fontSize: '13px', fontWeight: 500,
+              padding: '10px 16px', fontSize: '13px', fontWeight: tab === t.id ? 600 : 400,
               background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-              borderBottom: tab === t.id ? '2px solid var(--accent-yellow)' : '2px solid transparent',
+              borderBottom: tab === t.id ? '2px solid var(--blue)' : '2px solid transparent',
               color: tab === t.id ? 'var(--text-primary)' : 'var(--text-secondary)',
               marginBottom: '-1px',
             }}
@@ -98,12 +95,8 @@ export function Configuracion() {
 
       {/* Consultorio */}
       {tab === 'consultorio' && (
-        <div style={{
-          background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-          borderRadius: '12px', padding: '24px',
-          display: 'flex', flexDirection: 'column', gap: '16px',
-        }}>
-          <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>Datos del consultorio</h3>
+        <div style={cardSt}>
+          <h3 style={h3St}>Datos del consultorio</h3>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
             <FormField label="Nombre del consultorio">
               <input value={consultorioForm.nombre} onChange={e => setConsultorioForm(f => ({ ...f, nombre: e.target.value }))} style={inpSt} />
@@ -120,7 +113,7 @@ export function Configuracion() {
           </FormField>
           <FormField label="Logo">
             <button style={{
-              background: 'var(--bg-card-deep)', border: '2px dashed var(--border)',
+              background: 'var(--surface-raised)', border: '2px dashed var(--border)',
               borderRadius: '8px', padding: '20px', cursor: 'pointer',
               fontSize: '12px', color: 'var(--text-secondary)', fontFamily: 'inherit',
             }}>
@@ -135,12 +128,8 @@ export function Configuracion() {
 
       {/* Médico */}
       {tab === 'medico' && (
-        <div style={{
-          background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-          borderRadius: '12px', padding: '24px',
-          display: 'flex', flexDirection: 'column', gap: '16px',
-        }}>
-          <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>Datos del médico</h3>
+        <div style={cardSt}>
+          <h3 style={h3St}>Datos del médico</h3>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
             <FormField label="Nombre completo">
               <input value={medicoForm.nombre} onChange={e => setMedicoForm(f => ({ ...f, nombre: e.target.value }))} style={inpSt} />
@@ -157,7 +146,7 @@ export function Configuracion() {
           </div>
           <FormField label="Firma (se imprime en recetas)">
             <div style={{
-              background: 'var(--bg-card-deep)', border: '1px solid var(--border)',
+              background: 'var(--surface-raised)', border: '1px solid var(--border)',
               borderRadius: '8px', padding: '16px',
               fontStyle: 'italic', fontSize: '16px', color: 'var(--text-primary)',
             }}>
@@ -172,12 +161,8 @@ export function Configuracion() {
 
       {/* Agenda */}
       {tab === 'agenda' && (
-        <div style={{
-          background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-          borderRadius: '12px', padding: '24px',
-          display: 'flex', flexDirection: 'column', gap: '20px',
-        }}>
-          <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>Configuración de agenda</h3>
+        <div style={cardSt}>
+          <h3 style={h3St}>Configuración de agenda</h3>
 
           <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
             <FormField label="Duración default de consulta">
@@ -193,14 +178,14 @@ export function Configuracion() {
           </div>
 
           <div>
-            <div style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-secondary)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               Horarios de atención
             </div>
             <div style={{ overflowX: 'auto' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: `60px repeat(${HORAS.length}, 1fr)`, gap: '4px', minWidth: 600 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: `60px repeat(${HORAS.length}, 1fr)`, gap: '3px', minWidth: 600 }}>
                 <div />
                 {HORAS.map(h => (
-                  <div key={h} style={{ fontSize: '10px', color: 'var(--text-secondary)', textAlign: 'center' }}>{h.slice(0, 5)}</div>
+                  <div key={h} style={{ fontSize: '10px', color: 'var(--text-muted)', textAlign: 'center' }}>{h.slice(0, 5)}</div>
                 ))}
                 {DIAS_SEMANA.map(dia => (
                   <React.Fragment key={dia}>
@@ -212,9 +197,10 @@ export function Configuracion() {
                           key={hora}
                           onClick={() => toggleHorario(dia, hora)}
                           style={{
-                            height: '24px', borderRadius: '4px', border: 'none', cursor: 'pointer',
-                            background: activo ? 'rgba(228,242,34,0.4)' : 'var(--bg-card-deep)',
-                            transition: 'background 100ms ease',
+                            height: '24px', borderRadius: '4px', cursor: 'pointer',
+                            background: activo ? 'var(--blue-bg)' : 'var(--surface-raised)',
+                            border: activo ? '1px solid var(--blue-border)' : '1px solid var(--border-subtle)',
+                            transition: 'all 120ms ease',
                           }}
                         />
                       );
@@ -223,7 +209,7 @@ export function Configuracion() {
                 ))}
               </div>
             </div>
-            <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '8px' }}>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '8px' }}>
               Click en cada celda para activar/desactivar el horario
             </div>
           </div>
@@ -236,12 +222,8 @@ export function Configuracion() {
 
       {/* Notificaciones */}
       {tab === 'notificaciones' && (
-        <div style={{
-          background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-          borderRadius: '12px', padding: '24px',
-          display: 'flex', flexDirection: 'column', gap: '20px',
-        }}>
-          <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>Notificaciones automáticas</h3>
+        <div style={cardSt}>
+          <h3 style={h3St}>Notificaciones automáticas</h3>
 
           <Toggle
             label="Recordatorio por WhatsApp"
@@ -279,14 +261,13 @@ export function Configuracion() {
 
       {/* Plan */}
       {tab === 'plan' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           <div style={{
-            background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-            borderRadius: '12px', padding: '24px',
+            ...cardSt,
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           }}>
             <div>
-              <div style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)', marginBottom: '4px' }}>
+              <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
                 Plan Básico · $29 USD/mes
               </div>
               <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
@@ -296,16 +277,13 @@ export function Configuracion() {
             <Button variant="primary" onClick={() => setModalPlan(true)}>Ver planes</Button>
           </div>
 
-          <div style={{
-            background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-            borderRadius: '12px', padding: '20px',
-          }}>
-            <div style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-secondary)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <div style={cardSt}>
+            <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               Incluido en tu plan
             </div>
             {['1 médico', 'Hasta 500 turnos/mes', 'Historia clínica completa', 'Recetas digitales', 'Facturación básica'].map(f => (
               <div key={f} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 0', fontSize: '13px', color: 'var(--text-primary)' }}>
-                <span style={{ color: 'var(--accent-green)' }}>✓</span> {f}
+                <span style={{ color: 'var(--green)', fontWeight: 600 }}>✓</span> {f}
               </div>
             ))}
           </div>
@@ -314,25 +292,25 @@ export function Configuracion() {
 
       {/* Modal planes */}
       <Modal open={modalPlan} onClose={() => setModalPlan(false)} title="Elegir plan" maxWidth={720}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px' }}>
           {planesData.map(p => (
             <div
               key={p.nombre}
               style={{
-                background: p.destacado ? 'rgba(228,242,34,0.08)' : 'var(--bg-card-deep)',
-                border: `1px solid ${p.destacado ? 'var(--accent-yellow)' : 'var(--border)'}`,
-                borderRadius: '12px', padding: '20px',
+                background: p.destacado ? 'var(--blue-bg)' : 'var(--surface-raised)',
+                border: `1px solid ${p.destacado ? 'var(--blue-border)' : 'var(--border)'}`,
+                borderRadius: '10px', padding: '20px',
                 display: 'flex', flexDirection: 'column', gap: '12px',
               }}
             >
               <div>
-                <div style={{ fontSize: '16px', fontWeight: 500, color: 'var(--text-primary)' }}>{p.nombre}</div>
-                <div style={{ fontSize: '20px', fontWeight: 500, color: p.destacado ? 'var(--accent-yellow)' : 'var(--text-primary)', marginTop: '4px' }}>{p.precio}</div>
+                <div style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>{p.nombre}</div>
+                <div style={{ fontSize: '20px', fontWeight: 600, color: p.destacado ? 'var(--blue)' : 'var(--text-primary)', marginTop: '4px', letterSpacing: '-0.02em' }}>{p.precio}</div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 {p.features.map(f => (
                   <div key={f} style={{ display: 'flex', gap: '8px', fontSize: '12px', color: 'var(--text-secondary)' }}>
-                    <span style={{ color: 'var(--accent-green)' }}>✓</span> {f}
+                    <span style={{ color: 'var(--green)', fontWeight: 600 }}>✓</span> {f}
                   </div>
                 ))}
               </div>
@@ -365,16 +343,17 @@ function Toggle({ label, sublabel, value, onChange }: {
       <button
         onClick={() => onChange(!value)}
         style={{
-          width: '44px', height: '24px', borderRadius: '12px', border: 'none',
-          background: value ? 'var(--accent-green)' : 'var(--border)',
+          width: '42px', height: '22px', borderRadius: '11px', border: 'none',
+          background: value ? 'var(--blue)' : 'var(--border)',
           cursor: 'pointer', position: 'relative', transition: 'background 150ms ease', flexShrink: 0,
         }}
       >
         <div style={{
-          width: '18px', height: '18px', borderRadius: '50%', background: 'white',
+          width: '16px', height: '16px', borderRadius: '50%', background: 'white',
           position: 'absolute', top: '3px',
           left: value ? '23px' : '3px',
           transition: 'left 150ms ease',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
         }} />
       </button>
     </div>
@@ -390,9 +369,20 @@ function FormField({ label, children }: { label: string; children: React.ReactNo
   );
 }
 
+const cardSt: React.CSSProperties = {
+  background: 'var(--surface)', border: '1px solid var(--border)',
+  borderRadius: '10px', padding: '24px',
+  display: 'flex', flexDirection: 'column', gap: '16px',
+  boxShadow: 'var(--shadow-sm)',
+};
+
+const h3St: React.CSSProperties = {
+  margin: 0, fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.01em',
+};
+
 const inpSt: React.CSSProperties = {
-  background: 'var(--bg-card-deep)', border: '1px solid var(--border)',
-  borderRadius: '10px', padding: '10px 12px',
+  background: 'var(--surface-raised)', border: '1px solid var(--border)',
+  borderRadius: '8px', padding: '9px 12px',
   fontSize: '13px', color: 'var(--text-primary)',
   fontFamily: 'inherit', outline: 'none', width: '100%', boxSizing: 'border-box',
 };

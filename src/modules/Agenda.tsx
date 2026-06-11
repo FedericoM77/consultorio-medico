@@ -21,11 +21,19 @@ const HORAS = Array.from({ length: 25 }, (_, i) => {
 const DIAS = ['Lun 09', 'Mar 10', 'Mié 11', 'Jue 12', 'Vie 13'];
 
 const estadoColors: Record<string, string> = {
-  confirmado: 'rgba(0,214,56,0.2)',
-  'en-consultorio': 'rgba(228,242,34,0.2)',
-  pendiente: 'rgba(86,131,210,0.2)',
-  cancelado: 'rgba(255,73,44,0.15)',
-  atendido: 'rgba(153,155,163,0.15)',
+  confirmado: 'var(--green-bg)',
+  'en-consultorio': 'var(--blue-bg)',
+  pendiente: 'var(--amber-bg)',
+  cancelado: 'var(--red-bg)',
+  atendido: 'var(--border-subtle)',
+};
+
+const estadoBorders: Record<string, string> = {
+  confirmado: 'var(--green-border)',
+  'en-consultorio': 'var(--blue-border)',
+  pendiente: 'var(--amber-border)',
+  cancelado: 'var(--red-border)',
+  atendido: 'var(--border)',
 };
 
 export function Agenda() {
@@ -76,10 +84,11 @@ export function Agenda() {
               onClick={() => setVista(v)}
               style={{
                 padding: '6px 16px', fontSize: '13px', fontWeight: 500,
-                borderRadius: '4px', border: '1px solid var(--border)',
+                borderRadius: '7px', border: '1px solid var(--border)',
                 cursor: 'pointer', fontFamily: 'inherit',
-                background: vista === v ? 'var(--accent-yellow)' : 'transparent',
-                color: vista === v ? 'var(--bg-canvas)' : 'var(--text-secondary)',
+                background: vista === v ? 'var(--blue)' : 'var(--surface)',
+                color: vista === v ? '#fff' : 'var(--text-secondary)',
+                boxShadow: 'var(--shadow-sm)',
               }}
             >
               {v === 'dia' ? 'Día' : 'Semana'}
@@ -133,7 +142,7 @@ export function Agenda() {
             </div>
 
             <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '16px' }}>
-              <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Últimas consultas
               </div>
               {['03/06/2026 — Control HTA', '15/03/2026 — Control HTA + DBT', '20/01/2026 — Control anual']
@@ -149,9 +158,9 @@ export function Agenda() {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <button style={btnPrimaryStyle}>Iniciar consulta</button>
-              <button style={btnSecondaryStyle}>Reprogramar</button>
-              <button style={btnDestructiveStyle}>Cancelar turno</button>
+              <Button variant="primary" style={{ justifyContent: 'center' }}>Iniciar consulta</Button>
+              <Button variant="secondary" style={{ justifyContent: 'center' }}>Reprogramar</Button>
+              <Button variant="destructive" style={{ justifyContent: 'center' }}>Cancelar turno</Button>
             </div>
           </div>
         )}
@@ -227,8 +236,8 @@ export function Agenda() {
 function DiaView({ turnos, onClickTurno }: { turnos: Turno[]; onClickTurno: (t: Turno) => void }) {
   return (
     <div style={{
-      background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-      borderRadius: '12px', overflow: 'hidden',
+      background: 'var(--surface)', border: '1px solid var(--border)',
+      borderRadius: '10px', overflow: 'hidden', boxShadow: 'var(--shadow-sm)',
     }}>
       <div style={{ position: 'relative' }}>
         {HORAS.map(hora => (
@@ -242,7 +251,7 @@ function DiaView({ turnos, onClickTurno }: { turnos: Turno[]; onClickTurno: (t: 
           >
             <div style={{
               padding: '4px 12px', fontSize: '11px',
-              color: 'var(--text-secondary)', borderRight: '1px solid var(--border-subtle)',
+              color: 'var(--text-muted)', borderRight: '1px solid var(--border-subtle)',
               display: 'flex', alignItems: 'flex-start',
             }}>
               {hora}
@@ -259,7 +268,8 @@ function DiaView({ turnos, onClickTurno }: { turnos: Turno[]; onClickTurno: (t: 
                       style={{
                         position: 'absolute', left: '4px', right: '4px', top: '4px',
                         background: estadoColors[turno.estado] || 'var(--border-subtle)',
-                        border: 'none', borderRadius: '6px',
+                        border: `1px solid ${estadoBorders[turno.estado] || 'var(--border)'}`,
+                        borderRadius: '6px',
                         padding: '6px 10px', cursor: 'pointer', fontFamily: 'inherit',
                         textAlign: 'left',
                         height: `${(turno.duracion / 30) * 48 - 8}px`,
@@ -288,28 +298,28 @@ function SemanaView({ turnos, onClickTurno }: { turnos: Turno[]; onClickTurno: (
 
   return (
     <div style={{
-      background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-      borderRadius: '12px', overflow: 'auto',
+      background: 'var(--surface)', border: '1px solid var(--border)',
+      borderRadius: '10px', overflow: 'auto', boxShadow: 'var(--shadow-sm)',
     }}>
       <div style={{ display: 'grid', gridTemplateColumns: '64px repeat(5, 1fr)', minWidth: 700 }}>
-        <div style={{ background: 'var(--bg-card-deep)', borderBottom: '1px solid var(--border-subtle)', padding: '8px' }} />
+        <div style={{ background: 'var(--surface-raised)', borderBottom: '1px solid var(--border)', padding: '8px' }} />
         {DIAS.map(dia => (
           <div key={dia} style={{
-            background: 'var(--bg-card-deep)', borderBottom: '1px solid var(--border-subtle)',
+            background: 'var(--surface-raised)', borderBottom: '1px solid var(--border)',
             borderLeft: '1px solid var(--border-subtle)',
             padding: '8px 12px', fontSize: '12px', fontWeight: 500,
-            color: dia === 'Mié 11' ? 'var(--accent-yellow)' : 'var(--text-secondary)',
+            color: dia === 'Mié 11' ? 'var(--blue)' : 'var(--text-secondary)',
             textAlign: 'center',
           }}>
             {dia}
           </div>
         ))}
 
-        {HORAS.filter((_, i) => i % 2 === 0).map((hora, hi) => (
+        {HORAS.filter((_, i) => i % 2 === 0).map((hora) => (
           <React.Fragment key={hora}>
             <div style={{
               borderBottom: '1px solid var(--border-subtle)',
-              padding: '4px 8px', fontSize: '11px', color: 'var(--text-secondary)',
+              padding: '4px 8px', fontSize: '11px', color: 'var(--text-muted)',
               minHeight: '48px', display: 'flex', alignItems: 'center',
             }}>
               {hora}
@@ -331,7 +341,8 @@ function SemanaView({ turnos, onClickTurno }: { turnos: Turno[]; onClickTurno: (
                         onClick={() => onClickTurno(t)}
                         style={{
                           background: estadoColors[t.estado],
-                          border: 'none', borderRadius: '4px',
+                          border: `1px solid ${estadoBorders[t.estado] || 'var(--border)'}`,
+                          borderRadius: '4px',
                           padding: '4px 6px', cursor: 'pointer', width: '100%',
                           textAlign: 'left', fontFamily: 'inherit',
                           fontSize: '11px', color: 'var(--text-primary)',
@@ -354,7 +365,7 @@ function SemanaView({ turnos, onClickTurno }: { turnos: Turno[]; onClickTurno: (
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--border-subtle)' }}>
       <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{label}</span>
       <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-primary)' }}>{value}</span>
     </div>
@@ -371,14 +382,15 @@ function FormField({ label, children }: { label: string; children: React.ReactNo
 }
 
 const navBtnStyle: React.CSSProperties = {
-  background: 'var(--bg-card-deep)', border: '1px solid var(--border)',
-  borderRadius: '4px', padding: '6px', cursor: 'pointer',
+  background: 'var(--surface)', border: '1px solid var(--border)',
+  borderRadius: '7px', padding: '6px', cursor: 'pointer',
   color: 'var(--text-secondary)', display: 'flex', alignItems: 'center',
+  boxShadow: 'var(--shadow-sm)',
 };
 
 const inputStyle: React.CSSProperties = {
-  background: 'var(--bg-card-deep)', border: '1px solid var(--border)',
-  borderRadius: '10px', padding: '10px 12px',
+  background: 'var(--surface-raised)', border: '1px solid var(--border)',
+  borderRadius: '8px', padding: '9px 12px',
   fontSize: '13px', color: 'var(--text-primary)',
   fontFamily: 'inherit', outline: 'none', width: '100%',
   boxSizing: 'border-box',
@@ -387,22 +399,4 @@ const inputStyle: React.CSSProperties = {
 const selectStyle: React.CSSProperties = {
   ...inputStyle,
   cursor: 'pointer',
-};
-
-const btnPrimaryStyle: React.CSSProperties = {
-  background: 'var(--accent-yellow)', color: 'var(--bg-canvas)',
-  border: 'none', borderRadius: '4px', padding: '10px',
-  fontSize: '13px', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
-};
-
-const btnSecondaryStyle: React.CSSProperties = {
-  background: 'transparent', color: 'var(--text-primary)',
-  border: '1px solid var(--border)', borderRadius: '4px', padding: '10px',
-  fontSize: '13px', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
-};
-
-const btnDestructiveStyle: React.CSSProperties = {
-  background: 'transparent', color: 'var(--accent-orange)',
-  border: '1px solid var(--accent-orange)', borderRadius: '4px', padding: '10px',
-  fontSize: '13px', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
 };

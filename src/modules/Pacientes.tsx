@@ -64,27 +64,29 @@ export function Pacientes() {
           <button
             onClick={() => setFichaPaciente(null)}
             style={{
-              background: 'var(--bg-card-deep)', border: '1px solid var(--border)',
-              borderRadius: '4px', padding: '8px 12px', cursor: 'pointer',
+              background: 'var(--surface)', border: '1px solid var(--border)',
+              borderRadius: '7px', padding: '7px 12px', cursor: 'pointer',
               fontSize: '12px', color: 'var(--text-secondary)', fontFamily: 'inherit',
+              boxShadow: 'var(--shadow-sm)',
             }}
           >
             ← Volver
           </button>
-          <h1 style={{ margin: 0, fontSize: '18px', fontWeight: 500, color: 'var(--text-primary)' }}>
+          <h1 style={{ margin: 0, fontSize: '18px', fontWeight: 500, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
             Ficha del paciente
           </h1>
         </div>
 
         {/* Cabecera paciente */}
         <div style={{
-          background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-          borderRadius: '12px', padding: '24px',
+          background: 'var(--surface)', border: '1px solid var(--border)',
+          borderRadius: '10px', padding: '24px',
           display: 'flex', alignItems: 'center', gap: '20px',
+          boxShadow: 'var(--shadow-sm)',
         }}>
-          <Avatar nombre={`${fichaPaciente.nombre} ${fichaPaciente.apellido}`} size={64} />
+          <Avatar nombre={`${fichaPaciente.nombre} ${fichaPaciente.apellido}`} size={60} />
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: '20px', fontWeight: 500, color: 'var(--text-primary)', marginBottom: '4px' }}>
+            <div style={{ fontSize: '20px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px', letterSpacing: '-0.02em' }}>
               {fichaPaciente.nombre} {fichaPaciente.apellido}
             </div>
             <div style={{ display: 'flex', gap: '20px', fontSize: '13px', color: 'var(--text-secondary)' }}>
@@ -94,17 +96,19 @@ export function Pacientes() {
               {fichaPaciente.email && <span>{fichaPaciente.email}</span>}
             </div>
             {fichaPaciente.antecedentes.length > 0 && (
-              <div style={{ display: 'flex', gap: '6px', marginTop: '8px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: '6px', marginTop: '10px', flexWrap: 'wrap' }}>
                 {fichaPaciente.antecedentes.map(a => (
                   <span key={a} style={{
-                    background: 'rgba(86,131,210,0.15)', color: 'var(--accent-blue)',
-                    borderRadius: '999px', padding: '2px 10px', fontSize: '11px',
+                    background: 'var(--blue-bg)', color: 'var(--blue)',
+                    border: '1px solid var(--blue-border)',
+                    borderRadius: '5px', padding: '2px 8px', fontSize: '11px',
                   }}>{a}</span>
                 ))}
                 {fichaPaciente.alergias.map(a => (
                   <span key={a} style={{
-                    background: 'rgba(255,73,44,0.15)', color: 'var(--accent-orange)',
-                    borderRadius: '999px', padding: '2px 10px', fontSize: '11px',
+                    background: 'var(--red-bg)', color: 'var(--red)',
+                    border: '1px solid var(--red-border)',
+                    borderRadius: '5px', padding: '2px 8px', fontSize: '11px',
                   }}>Alergia: {a}</span>
                 ))}
               </div>
@@ -117,7 +121,7 @@ export function Pacientes() {
         </div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', gap: '4px', borderBottom: '1px solid var(--border-subtle)' }}>
+        <div style={{ display: 'flex', gap: '0', borderBottom: '1px solid var(--border)' }}>
           {([
             { id: 'historia', label: 'Historia Clínica' },
             { id: 'recetas', label: 'Recetas' },
@@ -128,10 +132,10 @@ export function Pacientes() {
               key={tab.id}
               onClick={() => setTabFicha(tab.id)}
               style={{
-                padding: '10px 16px', fontSize: '13px', fontWeight: 500,
+                padding: '10px 16px', fontSize: '13px', fontWeight: tabFicha === tab.id ? 600 : 400,
                 background: 'none', border: 'none', cursor: 'pointer',
                 fontFamily: 'inherit',
-                borderBottom: tabFicha === tab.id ? '2px solid var(--accent-yellow)' : '2px solid transparent',
+                borderBottom: tabFicha === tab.id ? '2px solid var(--blue)' : '2px solid transparent',
                 color: tabFicha === tab.id ? 'var(--text-primary)' : 'var(--text-secondary)',
                 marginBottom: '-1px',
               }}
@@ -144,24 +148,23 @@ export function Pacientes() {
         {/* Tab content */}
         {tabFicha === 'historia' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {consultasPaciente.length === 0 && (
-              <EmptyState text="Sin consultas registradas" />
-            )}
+            {consultasPaciente.length === 0 && <EmptyState text="Sin consultas registradas" />}
             {consultasPaciente.map(c => (
               <div key={c.id} style={{
-                background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-                borderRadius: '12px', padding: '20px',
+                background: 'var(--surface)', border: '1px solid var(--border)',
+                borderRadius: '10px', padding: '20px',
                 display: 'grid', gridTemplateColumns: '120px 1fr', gap: '16px',
+                boxShadow: 'var(--shadow-sm)',
               }}>
                 <div>
-                  <div style={{ fontSize: '12px', fontWeight: 500, color: 'var(--accent-blue)' }}>{c.fecha}</div>
-                  {c.cie10 && <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '4px' }}>CIE-10: {c.cie10}</div>}
+                  <div style={{ fontSize: '12px', fontWeight: 500, color: 'var(--blue)' }}>{c.fecha}</div>
+                  {c.cie10 && <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>CIE-10: {c.cie10}</div>}
                 </div>
                 <div>
                   <div style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)', marginBottom: '4px' }}>{c.motivo}</div>
                   <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '8px' }}>{c.diagnostico}</div>
                   {c.examenFisico && (
-                    <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '8px' }}>
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
                       {c.examenFisico.ta && <Vitals label="TA" value={c.examenFisico.ta} />}
                       {c.examenFisico.fc && <Vitals label="FC" value={`${c.examenFisico.fc} lpm`} />}
                       {c.examenFisico.temp && <Vitals label="Temp" value={`${c.examenFisico.temp}°C`} />}
@@ -180,14 +183,14 @@ export function Pacientes() {
             {recetasPaciente.length === 0 && <EmptyState text="Sin recetas" />}
             {recetasPaciente.map(r => (
               <div key={r.id} style={{
-                background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-                borderRadius: '12px', padding: '20px',
+                background: 'var(--surface)', border: '1px solid var(--border)',
+                borderRadius: '10px', padding: '20px', boxShadow: 'var(--shadow-sm)',
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                   <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{r.fecha}</span>
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                     {r.esCronica && (
-                      <span style={{ fontSize: '10px', color: 'var(--accent-blue)', background: 'rgba(86,131,210,0.15)', borderRadius: '999px', padding: '2px 8px' }}>
+                      <span style={{ fontSize: '10px', color: 'var(--blue)', background: 'var(--blue-bg)', border: '1px solid var(--blue-border)', borderRadius: '5px', padding: '2px 8px' }}>
                         Crónica
                       </span>
                     )}
@@ -209,9 +212,10 @@ export function Pacientes() {
             {cobrosPaciente.length === 0 && <EmptyState text="Sin cobros" />}
             {cobrosPaciente.map(c => (
               <div key={c.id} style={{
-                background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
+                background: 'var(--surface)', border: '1px solid var(--border)',
                 borderRadius: '8px', padding: '16px',
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                boxShadow: 'var(--shadow-sm)',
               }}>
                 <div>
                   <div style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 500 }}>{c.fecha}</div>
@@ -230,9 +234,10 @@ export function Pacientes() {
 
         {tabFicha === 'datos' && (
           <div style={{
-            background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-            borderRadius: '12px', padding: '24px',
+            background: 'var(--surface)', border: '1px solid var(--border)',
+            borderRadius: '10px', padding: '24px',
             display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px',
+            boxShadow: 'var(--shadow-sm)',
           }}>
             {[
               { label: 'Nombre completo', value: `${fichaPaciente.nombre} ${fichaPaciente.apellido}` },
@@ -245,13 +250,13 @@ export function Pacientes() {
               { label: 'Email', value: fichaPaciente.email || '—' },
             ].map(({ label, value }) => (
               <div key={label}>
-                <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>
                 <div style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 500 }}>{value}</div>
               </div>
             ))}
             {fichaPaciente.medicacionCronica.length > 0 && (
               <div style={{ gridColumn: '1/-1' }}>
-                <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Medicación crónica</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Medicación crónica</div>
                 <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{fichaPaciente.medicacionCronica.join(', ')}</div>
               </div>
             )}
@@ -268,7 +273,7 @@ export function Pacientes() {
         <div style={{ flex: 1, position: 'relative' }}>
           <Search size={15} style={{
             position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)',
-            color: 'var(--text-secondary)',
+            color: 'var(--text-muted)',
           }} />
           <input
             placeholder="Buscar por nombre, DNI u obra social…"
@@ -276,10 +281,11 @@ export function Pacientes() {
             onChange={e => setQuery(e.target.value)}
             style={{
               width: '100%', paddingLeft: '36px', paddingRight: '12px',
-              paddingTop: '10px', paddingBottom: '10px',
-              background: 'var(--bg-card)', border: '1px solid var(--border)',
-              borderRadius: '10px', fontSize: '13px', color: 'var(--text-primary)',
+              paddingTop: '9px', paddingBottom: '9px',
+              background: 'var(--surface)', border: '1px solid var(--border)',
+              borderRadius: '8px', fontSize: '13px', color: 'var(--text-primary)',
               fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box',
+              boxShadow: 'var(--shadow-sm)',
             }}
           />
         </div>
@@ -290,16 +296,17 @@ export function Pacientes() {
 
       {/* Tabla */}
       <div style={{
-        background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-        borderRadius: '12px', overflow: 'hidden',
+        background: 'var(--surface)', border: '1px solid var(--border)',
+        borderRadius: '10px', overflow: 'hidden', boxShadow: 'var(--shadow-sm)',
       }}>
         <div style={{
           display: 'grid', gridTemplateColumns: '2fr 60px 140px 120px 80px 40px',
           padding: '10px 20px',
-          borderBottom: '1px solid var(--border-subtle)',
+          borderBottom: '1px solid var(--border)',
+          background: 'var(--surface-raised)',
         }}>
           {['Paciente', 'Edad', 'Obra social', 'Última consulta', 'Consultas', ''].map(h => (
-            <span key={h} style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <span key={h} style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               {h}
             </span>
           ))}
@@ -314,28 +321,28 @@ export function Pacientes() {
               onClick={() => setFichaPaciente(p)}
               style={{
                 display: 'grid', gridTemplateColumns: '2fr 60px 140px 120px 80px 40px',
-                padding: '14px 20px', width: '100%', textAlign: 'left',
+                padding: '13px 20px', width: '100%', textAlign: 'left',
                 background: 'none', border: 'none', borderBottom: '1px solid var(--border-subtle)',
                 cursor: 'pointer', fontFamily: 'inherit', alignItems: 'center',
-                transition: 'background 150ms ease',
+                transition: 'background 140ms ease',
               }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'var(--border-subtle)')}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-raised)')}
               onMouseLeave={e => (e.currentTarget.style.background = 'none')}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Avatar nombre={`${p.nombre} ${p.apellido}`} size={32} />
+                <Avatar nombre={`${p.nombre} ${p.apellido}`} size={30} />
                 <div>
                   <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-primary)' }}>
                     {p.nombre} {p.apellido}
                   </div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{p.dni}</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{p.dni}</div>
                 </div>
               </div>
               <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{edad(p.fechaNacimiento)}</span>
               <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{p.obraSocial}</span>
               <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{ultima?.fecha ?? '—'}</span>
               <span style={{ fontSize: '13px', fontVariantNumeric: 'tabular-nums', color: 'var(--text-primary)' }}>{consultasP.length}</span>
-              <ChevronRight size={16} style={{ color: 'var(--text-secondary)' }} />
+              <ChevronRight size={16} style={{ color: 'var(--text-muted)' }} />
             </button>
           );
         })}
@@ -393,10 +400,11 @@ function FormField({ label, children }: { label: string; children: React.ReactNo
 function Vitals({ label, value }: { label: string; value: string }) {
   return (
     <div style={{
-      background: 'var(--bg-card-deep)', borderRadius: '6px', padding: '4px 8px',
+      background: 'var(--surface-raised)', border: '1px solid var(--border-subtle)',
+      borderRadius: '6px', padding: '4px 8px',
       fontSize: '11px',
     }}>
-      <span style={{ color: 'var(--text-secondary)' }}>{label}: </span>
+      <span style={{ color: 'var(--text-muted)' }}>{label}: </span>
       <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{value}</span>
     </div>
   );
@@ -411,8 +419,8 @@ function EmptyState({ text }: { text: string }) {
 }
 
 const inputSt: React.CSSProperties = {
-  background: 'var(--bg-card-deep)', border: '1px solid var(--border)',
-  borderRadius: '10px', padding: '10px 12px',
+  background: 'var(--surface-raised)', border: '1px solid var(--border)',
+  borderRadius: '8px', padding: '9px 12px',
   fontSize: '13px', color: 'var(--text-primary)',
   fontFamily: 'inherit', outline: 'none', width: '100%', boxSizing: 'border-box',
 };

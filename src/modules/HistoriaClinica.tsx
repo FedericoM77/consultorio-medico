@@ -79,16 +79,17 @@ export function HistoriaClinica() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <div style={{ flex: 1, position: 'relative' }}>
-          <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
+          <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
           <input
             placeholder="Buscar por paciente o diagnóstico…"
             value={query}
             onChange={e => setQuery(e.target.value)}
             style={{
-              width: '100%', paddingLeft: '36px', paddingRight: '12px', paddingTop: '10px', paddingBottom: '10px',
-              background: 'var(--bg-card)', border: '1px solid var(--border)',
-              borderRadius: '10px', fontSize: '13px', color: 'var(--text-primary)',
+              width: '100%', paddingLeft: '36px', paddingRight: '12px', paddingTop: '9px', paddingBottom: '9px',
+              background: 'var(--surface)', border: '1px solid var(--border)',
+              borderRadius: '8px', fontSize: '13px', color: 'var(--text-primary)',
               fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box',
+              boxShadow: 'var(--shadow-sm)',
             }}
           />
         </div>
@@ -99,12 +100,12 @@ export function HistoriaClinica() {
 
       {/* Lista */}
       <div style={{
-        background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-        borderRadius: '12px', overflow: 'hidden',
+        background: 'var(--surface)', border: '1px solid var(--border)',
+        borderRadius: '10px', overflow: 'hidden', boxShadow: 'var(--shadow-sm)',
       }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '100px 160px 1fr 200px', padding: '10px 20px', borderBottom: '1px solid var(--border-subtle)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '100px 160px 1fr 200px', padding: '10px 20px', borderBottom: '1px solid var(--border)', background: 'var(--surface-raised)' }}>
           {['Fecha', 'Paciente', 'Diagnóstico', 'Indicaciones'].map(h => (
-            <span key={h} style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</span>
+            <span key={h} style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</span>
           ))}
         </div>
 
@@ -119,12 +120,12 @@ export function HistoriaClinica() {
                 padding: '12px 20px', width: '100%', textAlign: 'left',
                 background: 'none', border: 'none', borderBottom: '1px solid var(--border-subtle)',
                 cursor: 'pointer', fontFamily: 'inherit', alignItems: 'center',
-                transition: 'background 150ms ease',
+                transition: 'background 140ms ease',
               }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'var(--border-subtle)')}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-raised)')}
               onMouseLeave={e => (e.currentTarget.style.background = 'none')}
             >
-              <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{c.fecha}</span>
+              <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{c.fecha}</span>
               <span style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{p?.nombre} {p?.apellido}</span>
               <span style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 500 }}>{c.diagnostico}</span>
               <span style={{ fontSize: '12px', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -147,7 +148,7 @@ export function HistoriaClinica() {
                   <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{detalle.fecha} · {detalle.motivo}</div>
                 </div>
                 {detalle.cie10 && (
-                  <span style={{ fontSize: '11px', color: 'var(--accent-blue)', background: 'rgba(86,131,210,0.15)', borderRadius: '6px', padding: '3px 8px' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--blue)', background: 'var(--blue-bg)', border: '1px solid var(--blue-border)', borderRadius: '6px', padding: '3px 8px' }}>
                     CIE-10: {detalle.cie10}
                   </span>
                 )}
@@ -161,7 +162,7 @@ export function HistoriaClinica() {
 
               {detalle.examenFisico && Object.values(detalle.examenFisico).some(Boolean) && (
                 <Section title="Examen físico">
-                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                     {detalle.examenFisico.ta && <Vital label="TA" value={detalle.examenFisico.ta} />}
                     {detalle.examenFisico.fc && <Vital label="FC" value={`${detalle.examenFisico.fc} lpm`} />}
                     {detalle.examenFisico.temp && <Vital label="Temp" value={`${detalle.examenFisico.temp}°C`} />}
@@ -183,7 +184,7 @@ export function HistoriaClinica() {
                       onChange={e => setNotasEdit(e.target.value)}
                       rows={4}
                       style={{
-                        background: 'var(--bg-card-deep)', border: '1px solid var(--border)',
+                        background: 'var(--surface-raised)', border: '1px solid var(--border)',
                         borderRadius: '8px', padding: '10px', fontSize: '13px',
                         color: 'var(--text-primary)', fontFamily: 'inherit', resize: 'vertical',
                         width: '100%', boxSizing: 'border-box',
@@ -201,7 +202,7 @@ export function HistoriaClinica() {
                     <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', flex: 1 }}>{detalle.indicaciones}</p>
                     <button
                       onClick={() => setEditandoNotas(true)}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: '2px', display: 'flex' }}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '2px', display: 'flex' }}
                     >
                       <Edit2 size={14} />
                     </button>
@@ -211,7 +212,7 @@ export function HistoriaClinica() {
 
               {detalle.proximoControl && (
                 <Section title="Próximo control">
-                  <p style={{ margin: 0, fontSize: '13px', color: 'var(--accent-blue)' }}>{detalle.proximoControl}</p>
+                  <p style={{ margin: 0, fontSize: '13px', color: 'var(--blue)' }}>{detalle.proximoControl}</p>
                 </Section>
               )}
             </div>
@@ -238,7 +239,7 @@ export function HistoriaClinica() {
           </FormField>
 
           <div>
-            <div style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-secondary)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               Examen físico
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
@@ -293,7 +294,7 @@ export function HistoriaClinica() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '12px' }}>
-      <div style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>
+      <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '8px' }}>
         {title}
       </div>
       {children}
@@ -304,9 +305,10 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Vital({ label, value }: { label: string; value: string }) {
   return (
     <div style={{
-      background: 'var(--bg-card-deep)', borderRadius: '6px', padding: '6px 10px', fontSize: '12px',
+      background: 'var(--surface-raised)', border: '1px solid var(--border-subtle)',
+      borderRadius: '6px', padding: '5px 9px', fontSize: '12px',
     }}>
-      <span style={{ color: 'var(--text-secondary)' }}>{label}: </span>
+      <span style={{ color: 'var(--text-muted)' }}>{label}: </span>
       <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{value}</span>
     </div>
   );
@@ -322,10 +324,10 @@ function FormField({ label, children }: { label: string; children: React.ReactNo
 }
 
 const inpSt: React.CSSProperties = {
-  background: 'var(--bg-canvas)', border: '1px solid var(--border)',
+  background: 'var(--canvas)', border: '1px solid var(--border)',
   borderRadius: '8px', padding: '8px 12px',
   fontSize: '13px', color: 'var(--text-primary)',
   fontFamily: 'inherit', outline: 'none', width: '100%', boxSizing: 'border-box',
 };
 
-const selSt: React.CSSProperties = { ...inpSt, cursor: 'pointer', background: 'var(--bg-card-deep)' };
+const selSt: React.CSSProperties = { ...inpSt, cursor: 'pointer', background: 'var(--surface-raised)' };

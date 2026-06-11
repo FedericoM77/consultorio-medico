@@ -33,10 +33,10 @@ const lineData6M = [
 ];
 
 const diagnosticos = [
-  { nombre: 'Hipertensión arterial', porcentaje: 34, color: 'var(--accent-blue)' },
-  { nombre: 'Control sano adulto', porcentaje: 22, color: 'var(--accent-green)' },
-  { nombre: 'Diabetes tipo 2', porcentaje: 18, color: 'var(--accent-yellow)' },
-  { nombre: 'Lumbalgia', porcentaje: 14, color: 'var(--accent-orange)' },
+  { nombre: 'Hipertensión arterial', porcentaje: 34, color: 'var(--blue)' },
+  { nombre: 'Control sano adulto', porcentaje: 22, color: 'var(--green)' },
+  { nombre: 'Diabetes tipo 2', porcentaje: 18, color: 'var(--purple)' },
+  { nombre: 'Lumbalgia', porcentaje: 14, color: 'var(--amber)' },
   { nombre: 'Rinitis alérgica', porcentaje: 12, color: 'var(--text-secondary)' },
 ];
 
@@ -66,10 +66,11 @@ export function Estadisticas() {
             onClick={() => setPeriodo(p)}
             style={{
               padding: '6px 16px', fontSize: '13px', fontWeight: 500,
-              borderRadius: '4px', border: '1px solid var(--border)',
+              borderRadius: '7px', border: '1px solid var(--border)',
               cursor: 'pointer', fontFamily: 'inherit',
-              background: periodo === p ? 'var(--accent-yellow)' : 'transparent',
-              color: periodo === p ? 'var(--bg-canvas)' : 'var(--text-secondary)',
+              background: periodo === p ? 'var(--blue)' : 'var(--surface)',
+              color: periodo === p ? '#fff' : 'var(--text-secondary)',
+              boxShadow: 'var(--shadow-sm)',
             }}
           >
             {p.charAt(0).toUpperCase() + p.slice(1)}
@@ -87,13 +88,13 @@ export function Estadisticas() {
           { label: 'Ingresos', value: m.ingresos },
         ].map(({ label, value }) => (
           <div key={label} style={{
-            background: 'var(--bg-card-deep)', border: '1px solid var(--border-subtle)',
-            borderRadius: '12px', padding: '16px',
+            background: 'var(--surface)', border: '1px solid var(--border)',
+            borderRadius: '10px', padding: '16px', boxShadow: 'var(--shadow-sm)',
           }}>
-            <div style={{ fontSize: '11px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '8px' }}>
               {label}
             </div>
-            <div style={{ fontSize: '24px', fontWeight: 500, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}>
+            <div style={{ fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>
               {value}
             </div>
           </div>
@@ -101,63 +102,57 @@ export function Estadisticas() {
       </div>
 
       {/* Gráficos */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
         <div style={{
-          background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-          borderRadius: '12px', padding: '20px',
+          background: 'var(--surface)', border: '1px solid var(--border)',
+          borderRadius: '10px', padding: '20px', boxShadow: 'var(--shadow-sm)',
         }}>
-          <h3 style={{ margin: '0 0 16px', fontSize: '13px', fontWeight: 500, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            CONSULTAS POR DÍA
-          </h3>
+          <h3 style={sTitle}>Consultas por día</h3>
           <ResponsiveContainer width="100%" height={140}>
             <BarChart data={barDataMes} margin={{ left: -24, right: 0, top: 4, bottom: 0 }}>
-              <XAxis dataKey="dia" tick={{ fontSize: 11, fill: 'var(--text-secondary)' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: 'var(--text-secondary)' }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '6px', fontSize: '12px' }} />
-              <Bar dataKey="turnos" fill="var(--accent-yellow)" radius={[3, 3, 0, 0]} isAnimationActive={false} />
+              <XAxis dataKey="dia" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '12px', boxShadow: 'var(--shadow-md)' }} />
+              <Bar dataKey="turnos" fill="var(--blue)" radius={[4, 4, 0, 0]} isAnimationActive={false} />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
         <div style={{
-          background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-          borderRadius: '12px', padding: '20px',
+          background: 'var(--surface)', border: '1px solid var(--border)',
+          borderRadius: '10px', padding: '20px', boxShadow: 'var(--shadow-sm)',
         }}>
-          <h3 style={{ margin: '0 0 16px', fontSize: '13px', fontWeight: 500, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            INGRESOS — ÚLTIMOS 6 MESES
-          </h3>
+          <h3 style={sTitle}>Ingresos — últimos 6 meses</h3>
           <ResponsiveContainer width="100%" height={140}>
             <LineChart data={lineData6M} margin={{ left: -12, right: 0, top: 4, bottom: 0 }}>
-              <XAxis dataKey="mes" tick={{ fontSize: 11, fill: 'var(--text-secondary)' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: 'var(--text-secondary)' }} axisLine={false} tickLine={false} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} />
+              <XAxis dataKey="mes" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} />
               <Tooltip
-                contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '6px', fontSize: '12px' }}
+                contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '12px', boxShadow: 'var(--shadow-md)' }}
                 formatter={(v: number) => [`$${v.toLocaleString('es-AR')}`, 'Ingresos']}
               />
-              <Line type="monotone" dataKey="ingresos" stroke="var(--accent-yellow)" strokeWidth={2} dot={false} isAnimationActive={false} />
+              <Line type="monotone" dataKey="ingresos" stroke="var(--blue)" strokeWidth={2} dot={false} isAnimationActive={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>
       </div>
 
       {/* Top diagnósticos + Heatmap */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
         <div style={{
-          background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-          borderRadius: '12px', padding: '20px',
+          background: 'var(--surface)', border: '1px solid var(--border)',
+          borderRadius: '10px', padding: '20px', boxShadow: 'var(--shadow-sm)',
         }}>
-          <h3 style={{ margin: '0 0 16px', fontSize: '13px', fontWeight: 500, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            TOP 5 DIAGNÓSTICOS
-          </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <h3 style={sTitle}>Top 5 diagnósticos</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {diagnosticos.map((d, i) => (
               <div key={i}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
                   <span style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{d.nombre}</span>
-                  <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontVariantNumeric: 'tabular-nums' }}>{d.porcentaje}%</span>
+                  <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontVariantNumeric: 'tabular-nums' }}>{d.porcentaje}%</span>
                 </div>
-                <div style={{ height: '4px', background: 'var(--border-subtle)', borderRadius: '2px' }}>
-                  <div style={{ height: '100%', width: `${d.porcentaje}%`, background: d.color, borderRadius: '2px' }} />
+                <div style={{ height: '4px', background: 'var(--border)', borderRadius: '2px' }}>
+                  <div style={{ height: '100%', width: `${d.porcentaje}%`, background: d.color, borderRadius: '2px', transition: 'width 400ms ease' }} />
                 </div>
               </div>
             ))}
@@ -165,21 +160,19 @@ export function Estadisticas() {
         </div>
 
         <div style={{
-          background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-          borderRadius: '12px', padding: '20px',
+          background: 'var(--surface)', border: '1px solid var(--border)',
+          borderRadius: '10px', padding: '20px', boxShadow: 'var(--shadow-sm)',
         }}>
-          <h3 style={{ margin: '0 0 16px', fontSize: '13px', fontWeight: 500, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            MAPA DE CALOR HORARIO
-          </h3>
+          <h3 style={sTitle}>Mapa de calor horario</h3>
           <div style={{ overflowX: 'auto' }}>
             <div style={{ display: 'grid', gridTemplateColumns: `40px repeat(${HORAS_MAP.length}, 1fr)`, gap: '2px', minWidth: 480 }}>
               <div />
               {HORAS_MAP.map(h => (
-                <div key={h} style={{ fontSize: '9px', color: 'var(--text-secondary)', textAlign: 'center', paddingBottom: '4px' }}>{h}</div>
+                <div key={h} style={{ fontSize: '9px', color: 'var(--text-muted)', textAlign: 'center', paddingBottom: '4px' }}>{h}</div>
               ))}
               {DIAS_MAP.map(dia => (
                 <React.Fragment key={dia}>
-                  <div style={{ fontSize: '10px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center' }}>{dia}</div>
+                  <div style={{ fontSize: '10px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>{dia}</div>
                   {HORAS_MAP.map(hora => {
                     const val = heatmapData[dia]?.[hora] ?? 0;
                     const opacity = val / 10;
@@ -189,7 +182,7 @@ export function Estadisticas() {
                         title={`${dia} ${hora}: ${val} turnos`}
                         style={{
                           height: '20px', borderRadius: '3px',
-                          background: `rgba(228,242,34,${opacity})`,
+                          background: `rgba(79,131,248,${opacity})`,
                           border: '1px solid var(--border-subtle)',
                         }}
                       />
@@ -199,15 +192,22 @@ export function Estadisticas() {
               ))}
             </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
-            <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>Bajo</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '12px' }}>
+            <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Bajo</span>
             {[0.1, 0.3, 0.5, 0.7, 0.9].map(o => (
-              <div key={o} style={{ width: '16px', height: '12px', borderRadius: '2px', background: `rgba(228,242,34,${o})` }} />
+              <div key={o} style={{ width: '16px', height: '10px', borderRadius: '2px', background: `rgba(79,131,248,${o})` }} />
             ))}
-            <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>Alto</span>
+            <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Alto</span>
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+const sTitle: React.CSSProperties = {
+  margin: '0 0 16px',
+  fontSize: '11px', fontWeight: 600,
+  color: 'var(--text-muted)',
+  textTransform: 'uppercase', letterSpacing: '0.06em',
+};

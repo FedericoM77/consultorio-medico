@@ -1,71 +1,73 @@
 import React from 'react';
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive';
+type Variant = 'primary' | 'secondary' | 'ghost' | 'destructive' | 'outline';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: ButtonVariant;
-  size?: 'sm' | 'md';
+  variant?: Variant;
+  size?: 'sm' | 'md' | 'lg';
   children: React.ReactNode;
 }
 
 export function Button({ variant = 'secondary', size = 'md', children, style, ...props }: ButtonProps) {
-  const padding = size === 'sm' ? '0 14px' : '0 18px';
-  const height = size === 'sm' ? '32px' : '36px';
-  const fontSize = size === 'sm' ? '12px' : '13px';
+  const heights: Record<typeof size, string> = { sm: '30px', md: '34px', lg: '40px' };
+  const pads:    Record<typeof size, string> = { sm: '0 12px', md: '0 16px', lg: '0 20px' };
+  const sizes:   Record<typeof size, string> = { sm: '12px', md: '13px', lg: '14px' };
 
   const base: React.CSSProperties = {
-    height, padding, fontSize, fontWeight: 500,
-    cursor: 'pointer', fontFamily: 'inherit',
-    borderRadius: '8px',
+    height: heights[size], padding: pads[size],
+    fontSize: sizes[size], fontWeight: 500, letterSpacing: '-0.01em',
+    cursor: 'pointer', fontFamily: 'inherit', borderRadius: '7px',
     display: 'inline-flex', alignItems: 'center', gap: '6px',
-    whiteSpace: 'nowrap',
-    transition: 'all 150ms ease',
-    letterSpacing: '-0.01em',
-    position: 'relative',
+    whiteSpace: 'nowrap', transition: 'all 140ms ease',
+    outline: 'none',
   };
 
-  const variants: Record<ButtonVariant, React.CSSProperties> = {
+  const variants: Record<Variant, React.CSSProperties> = {
     primary: {
-      background: 'var(--accent-yellow)',
-      color: '#0a0a0f',
-      border: 'none',
-      boxShadow: '0 1px 3px rgba(0,0,0,0.3), 0 0 0 1px rgba(212,224,0,0.3)',
+      background: 'var(--blue)',
+      color: '#fff',
+      border: '1px solid transparent',
       fontWeight: 600,
+      boxShadow: '0 1px 2px rgba(0,0,0,0.25)',
     },
     secondary: {
-      background: 'transparent',
+      background: 'var(--surface)',
       color: 'var(--text-primary)',
       border: '1px solid var(--border)',
       boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
     },
+    outline: {
+      background: 'transparent',
+      color: 'var(--blue)',
+      border: '1px solid var(--blue-border)',
+    },
     ghost: {
       background: 'transparent',
-      color: 'var(--accent-blue)',
-      border: 'none',
-      boxShadow: 'none',
+      color: 'var(--text-secondary)',
+      border: '1px solid transparent',
     },
     destructive: {
-      background: 'var(--accent-orange-glow)',
-      color: 'var(--accent-orange)',
-      border: '1px solid var(--accent-orange)',
-      boxShadow: 'none',
+      background: 'var(--red-bg)',
+      color: 'var(--red)',
+      border: '1px solid var(--red-border)',
     },
   };
 
-  const hoverStyles: Record<ButtonVariant, Partial<React.CSSProperties>> = {
-    primary: { filter: 'brightness(1.08)', boxShadow: '0 2px 8px rgba(0,0,0,0.3), 0 0 12px var(--accent-yellow-glow)' },
-    secondary: { background: 'var(--bg-hover)', borderColor: 'var(--text-muted)' },
-    ghost: { background: 'var(--accent-blue-glow)' },
-    destructive: { background: 'rgba(240,79,44,0.15)' },
+  const hovers: Record<Variant, React.CSSProperties> = {
+    primary:     { filter: 'brightness(1.1)' },
+    secondary:   { background: 'var(--surface-raised)', borderColor: 'var(--text-muted)' },
+    outline:     { background: 'var(--blue-bg)' },
+    ghost:       { background: 'var(--surface-raised)', color: 'var(--text-primary)' },
+    destructive: { filter: 'brightness(1.05)' },
   };
 
-  const [hovered, setHovered] = React.useState(false);
+  const [hov, setHov] = React.useState(false);
 
   return (
     <button
-      style={{ ...base, ...variants[variant], ...(hovered ? hoverStyles[variant] : {}), ...style }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      style={{ ...base, ...variants[variant], ...(hov ? hovers[variant] : {}), ...style }}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
       {...props}
     >
       {children}

@@ -61,7 +61,7 @@ export function Recetas() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 500, color: 'var(--text-primary)' }}>Recetas</h2>
+        <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>Recetas</h2>
         <Button variant="primary" onClick={() => setModalNuevo(true)}>
           <Plus size={15} /> Nueva receta
         </Button>
@@ -69,11 +69,11 @@ export function Recetas() {
 
       {/* Lista de recetas */}
       <div style={{
-        background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-        borderRadius: '12px', overflow: 'hidden',
+        background: 'var(--surface)', border: '1px solid var(--border)',
+        borderRadius: '10px', overflow: 'hidden', boxShadow: 'var(--shadow-sm)',
       }}>
-        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-subtle)' }}>
-          <h3 style={{ margin: 0, fontSize: '13px', fontWeight: 500, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border)', background: 'var(--surface-raised)' }}>
+          <h3 style={{ margin: 0, fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
             Todas las recetas ({recetas.length})
           </h3>
         </div>
@@ -85,10 +85,10 @@ export function Recetas() {
               style={{
                 display: 'grid', gridTemplateColumns: '100px 1fr 180px auto',
                 alignItems: 'center', gap: '16px',
-                padding: '14px 20px', borderBottom: '1px solid var(--border-subtle)',
+                padding: '13px 20px', borderBottom: '1px solid var(--border-subtle)',
               }}
             >
-              <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{r.fecha}</span>
+              <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{r.fecha}</span>
               <div>
                 <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-primary)', marginBottom: '2px' }}>
                   {p?.nombre} {p?.apellido}
@@ -99,7 +99,7 @@ export function Recetas() {
               </div>
               <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                 {r.esCronica && (
-                  <span style={{ fontSize: '10px', color: 'var(--accent-blue)', background: 'rgba(86,131,210,0.15)', borderRadius: '999px', padding: '2px 8px' }}>
+                  <span style={{ fontSize: '10px', color: 'var(--blue)', background: 'var(--blue-bg)', border: '1px solid var(--blue-border)', borderRadius: '5px', padding: '2px 8px' }}>
                     Crónica
                   </span>
                 )}
@@ -108,8 +108,8 @@ export function Recetas() {
               <button
                 onClick={() => setModalPreview(r)}
                 style={{
-                  background: 'var(--bg-card-deep)', border: '1px solid var(--border)',
-                  borderRadius: '4px', padding: '6px 10px', cursor: 'pointer',
+                  background: 'var(--surface-raised)', border: '1px solid var(--border)',
+                  borderRadius: '6px', padding: '6px 10px', cursor: 'pointer',
                   fontSize: '11px', color: 'var(--text-secondary)', fontFamily: 'inherit',
                   display: 'flex', alignItems: 'center', gap: '4px',
                 }}
@@ -123,11 +123,11 @@ export function Recetas() {
 
       {/* Sección crónicas */}
       <div style={{
-        background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-        borderRadius: '12px', overflow: 'hidden',
+        background: 'var(--surface)', border: '1px solid var(--border)',
+        borderRadius: '10px', overflow: 'hidden', boxShadow: 'var(--shadow-sm)',
       }}>
-        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-subtle)' }}>
-          <h3 style={{ margin: 0, fontSize: '13px', fontWeight: 500, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border)', background: 'var(--surface-raised)' }}>
+          <h3 style={{ margin: 0, fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
             Medicación crónica — renovación mensual
           </h3>
         </div>
@@ -139,7 +139,7 @@ export function Recetas() {
               style={{
                 display: 'grid', gridTemplateColumns: '1fr auto',
                 alignItems: 'center', gap: '16px',
-                padding: '14px 20px', borderBottom: '1px solid var(--border-subtle)',
+                padding: '13px 20px', borderBottom: '1px solid var(--border-subtle)',
               }}
             >
               <div>
@@ -170,10 +170,11 @@ export function Recetas() {
 
           {form.medicamentos.map((med, i) => (
             <div key={i} style={{
-              background: 'var(--bg-card-deep)', borderRadius: '8px', padding: '16px',
+              background: 'var(--surface-raised)', border: '1px solid var(--border-subtle)',
+              borderRadius: '8px', padding: '16px',
               display: 'flex', flexDirection: 'column', gap: '10px',
             }}>
-              <div style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>
+              <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Medicamento {i + 1}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
@@ -300,10 +301,10 @@ function FormField({ label, children }: { label: string; children: React.ReactNo
 }
 
 const inputSt: React.CSSProperties = {
-  background: 'var(--bg-canvas)', border: '1px solid var(--border)',
-  borderRadius: '10px', padding: '8px 12px',
+  background: 'var(--canvas)', border: '1px solid var(--border)',
+  borderRadius: '8px', padding: '8px 12px',
   fontSize: '13px', color: 'var(--text-primary)',
   fontFamily: 'inherit', outline: 'none', width: '100%', boxSizing: 'border-box',
 };
 
-const selectSt: React.CSSProperties = { ...inputSt, cursor: 'pointer', background: 'var(--bg-card-deep)' };
+const selectSt: React.CSSProperties = { ...inputSt, cursor: 'pointer', background: 'var(--surface-raised)' };

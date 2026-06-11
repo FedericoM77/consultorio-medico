@@ -27,7 +27,7 @@ function AppContent() {
   const [modulo, setModulo] = useState<ModuloActivo>('dashboard');
 
   return (
-    <div style={{ background: 'var(--bg-canvas)', minHeight: '100vh', color: 'var(--text-primary)' }}>
+    <div style={{ background: 'var(--canvas)', minHeight: '100vh', color: 'var(--text-primary)' }}>
       <Header />
       <Sidebar activo={modulo} onChange={setModulo} />
 
@@ -63,7 +63,7 @@ function AppContent() {
       <nav style={{
         display: 'none',
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 80,
-        background: 'var(--bg-card)', borderTop: '1px solid var(--border-subtle)',
+        background: 'var(--surface)', borderTop: '1px solid var(--border-subtle)',
         padding: '8px 0',
       }}
         className="mobile-nav"
