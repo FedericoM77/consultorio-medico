@@ -87,10 +87,7 @@ export function Estadisticas() {
           { label: 'Nuevos pacientes', value: m.nuevos },
           { label: 'Ingresos', value: m.ingresos },
         ].map(({ label, value }) => (
-          <div key={label} style={{
-            background: 'var(--surface)', border: '1px solid var(--border)',
-            borderRadius: '10px', padding: '16px', boxShadow: 'var(--shadow-sm)',
-          }}>
+          <div key={label} className="card" style={{ padding: '16px' }}>
             <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '8px' }}>
               {label}
             </div>
@@ -103,10 +100,7 @@ export function Estadisticas() {
 
       {/* Gráficos */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-        <div style={{
-          background: 'var(--surface)', border: '1px solid var(--border)',
-          borderRadius: '10px', padding: '20px', boxShadow: 'var(--shadow-sm)',
-        }}>
+        <div className="card" style={{ padding: '20px' }}>
           <h3 style={sTitle}>Consultas por día</h3>
           <ResponsiveContainer width="100%" height={140}>
             <BarChart data={barDataMes} margin={{ left: -24, right: 0, top: 4, bottom: 0 }}>
@@ -118,10 +112,7 @@ export function Estadisticas() {
           </ResponsiveContainer>
         </div>
 
-        <div style={{
-          background: 'var(--surface)', border: '1px solid var(--border)',
-          borderRadius: '10px', padding: '20px', boxShadow: 'var(--shadow-sm)',
-        }}>
+        <div className="card" style={{ padding: '20px' }}>
           <h3 style={sTitle}>Ingresos — últimos 6 meses</h3>
           <ResponsiveContainer width="100%" height={140}>
             <LineChart data={lineData6M} margin={{ left: -12, right: 0, top: 4, bottom: 0 }}>
@@ -139,10 +130,7 @@ export function Estadisticas() {
 
       {/* Top diagnósticos + Heatmap */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-        <div style={{
-          background: 'var(--surface)', border: '1px solid var(--border)',
-          borderRadius: '10px', padding: '20px', boxShadow: 'var(--shadow-sm)',
-        }}>
+        <div className="card" style={{ padding: '20px' }}>
           <h3 style={sTitle}>Top 5 diagnósticos</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {diagnosticos.map((d, i) => (
@@ -159,10 +147,7 @@ export function Estadisticas() {
           </div>
         </div>
 
-        <div style={{
-          background: 'var(--surface)', border: '1px solid var(--border)',
-          borderRadius: '10px', padding: '20px', boxShadow: 'var(--shadow-sm)',
-        }}>
+        <div className="card" style={{ padding: '20px' }}>
           <h3 style={sTitle}>Mapa de calor horario</h3>
           <div style={{ overflowX: 'auto' }}>
             <div style={{ display: 'grid', gridTemplateColumns: `40px repeat(${HORAS_MAP.length}, 1fr)`, gap: '2px', minWidth: 480 }}>

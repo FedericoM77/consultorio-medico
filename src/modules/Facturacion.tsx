@@ -85,18 +85,15 @@ export function Facturacion() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Métricas header */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px' }}>
-        <MetricCard icon={<DollarSign size={15} />} label="Total cobrado mes" value={`$${totalMes.toLocaleString('es-AR')}`} color="var(--green)" bg="var(--green-bg)" />
-        <MetricCard icon={<TrendingUp size={15} />} label="Pendiente de cobro" value={`$${pendiente.toLocaleString('es-AR')}`} color="var(--amber)" bg="var(--amber-bg)" />
-        <MetricCard icon={<Users size={15} />} label="Consultas" value={String(totalConsultas)} color="var(--blue)" bg="var(--blue-bg)" />
-        <MetricCard icon={<BarChart2 size={15} />} label="Ticket promedio" value={`$${ticketProm.toLocaleString('es-AR')}`} color="var(--purple)" bg="var(--purple-bg)" />
+        <MetricCard icon={<DollarSign size={15} style={{ color: 'var(--green)' }} />} label="Total cobrado mes" value={`$${totalMes.toLocaleString('es-AR')}`} iconClass="icon-g" glowClass="glow-g" />
+        <MetricCard icon={<TrendingUp size={15} style={{ color: 'var(--amber)' }} />} label="Pendiente de cobro" value={`$${pendiente.toLocaleString('es-AR')}`} iconClass="icon-a" glowClass="glow-a" />
+        <MetricCard icon={<Users size={15} style={{ color: 'var(--blue)' }} />} label="Consultas" value={String(totalConsultas)} iconClass="icon-b" glowClass="glow-b" />
+        <MetricCard icon={<BarChart2 size={15} style={{ color: 'var(--purple)' }} />} label="Ticket promedio" value={`$${ticketProm.toLocaleString('es-AR')}`} iconClass="icon-p" glowClass="glow-p" />
       </div>
 
       {/* Gráficos */}
       <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: '14px' }}>
-        <div style={{
-          background: 'var(--surface)', border: '1px solid var(--border)',
-          borderRadius: '10px', padding: '20px', boxShadow: 'var(--shadow-sm)',
-        }}>
+        <div className="card" style={{ padding: '20px' }}>
           <h3 style={sectionTitle}>Ingresos — últimos 30 días</h3>
           <ResponsiveContainer width="100%" height={160}>
             <LineChart data={lineData} margin={{ left: -20, right: 8, top: 4, bottom: 0 }}>
@@ -111,10 +108,7 @@ export function Facturacion() {
           </ResponsiveContainer>
         </div>
 
-        <div style={{
-          background: 'var(--surface)', border: '1px solid var(--border)',
-          borderRadius: '10px', padding: '20px', boxShadow: 'var(--shadow-sm)',
-        }}>
+        <div className="card" style={{ padding: '20px' }}>
           <h3 style={sectionTitle}>Por obra social</h3>
           <ResponsiveContainer width="100%" height={160}>
             <PieChart>
@@ -131,10 +125,7 @@ export function Facturacion() {
       </div>
 
       {/* Tabla movimientos */}
-      <div style={{
-        background: 'var(--surface)', border: '1px solid var(--border)',
-        borderRadius: '10px', overflow: 'hidden', boxShadow: 'var(--shadow-sm)',
-      }}>
+      <div className="card" style={{ overflow: 'hidden' }}>
         <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '12px', background: 'var(--surface-raised)' }}>
           <h3 style={{ ...sectionTitle, flex: 1 }}>Movimientos</h3>
           {(['todos', 'cobrado', 'pendiente', 'a-facturar'] as FiltroEstado[]).map(f => (
@@ -164,6 +155,7 @@ export function Facturacion() {
           return (
             <div
               key={c.id}
+              className="row-hover"
               style={{
                 display: 'grid', gridTemplateColumns: '100px 1fr 140px 100px 100px 80px',
                 padding: '12px 20px', borderBottom: '1px solid var(--border-subtle)', alignItems: 'center',
@@ -194,10 +186,7 @@ export function Facturacion() {
       </div>
 
       {/* Liquidaciones */}
-      <div style={{
-        background: 'var(--surface)', border: '1px solid var(--border)',
-        borderRadius: '10px', overflow: 'hidden', boxShadow: 'var(--shadow-sm)',
-      }}>
+      <div className="card" style={{ overflow: 'hidden' }}>
         <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border)', background: 'var(--surface-raised)' }}>
           <h3 style={sectionTitle}>Liquidaciones obras sociales — Junio 2026</h3>
         </div>
@@ -224,24 +213,20 @@ export function Facturacion() {
   );
 }
 
-function MetricCard({ icon, label, value, color, bg }: { icon: React.ReactNode; label: string; value: string; color: string; bg: string }) {
+function MetricCard({ icon, label, value, iconClass, glowClass }: { icon: React.ReactNode; label: string; value: string; iconClass: string; glowClass: string }) {
   return (
-    <div style={{
-      background: 'var(--surface)', border: '1px solid var(--border)',
-      borderRadius: '10px', padding: '18px 20px', boxShadow: 'var(--shadow-sm)',
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-        <div style={{
-          width: 30, height: 30, borderRadius: '7px',
-          background: bg, color,
+    <div className={`card ${glowClass}`} style={{ padding: '18px 20px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+        <div className={iconClass} style={{
+          width: 34, height: 34, borderRadius: '9px',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           flexShrink: 0,
         }}>
           {icon}
         </div>
-        <span style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</span>
+        <span className="section-label">{label}</span>
       </div>
-      <div style={{ fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>{value}</div>
+      <div className="num-display" style={{ fontSize: '26px' }}>{value}</div>
     </div>
   );
 }

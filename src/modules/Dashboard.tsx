@@ -42,39 +42,39 @@ export function Dashboard() {
       {/* Metric cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px' }}>
         <MetricCard
-          icon={<Calendar size={15} />}
+          icon={<Calendar size={16} style={{ color: 'var(--blue)' }} />}
           label="Turnos hoy"
           value={String(turnosHoy.length)}
           sub={`${confirmados} confirmados · ${pendientesTurno} pendientes`}
-          color="var(--blue)"
-          colorBg="var(--blue-bg)"
+          iconClass="icon-b"
+          glowClass="glow-b"
           trend="+2 vs ayer"
         />
         <MetricCard
-          icon={<DollarSign size={15} />}
+          icon={<DollarSign size={16} style={{ color: 'var(--green)' }} />}
           label="Cobrado hoy"
           value={`$${totalCobradoHoy.toLocaleString('es-AR')}`}
           sub={`${pendientesHoy} pendientes de cobro`}
-          color="var(--green)"
-          colorBg="var(--green-bg)"
+          iconClass="icon-g"
+          glowClass="glow-g"
           trend="+12% vs sem."
         />
         <MetricCard
-          icon={<Users size={15} />}
+          icon={<Users size={16} style={{ color: 'var(--purple)' }} />}
           label="Nuevos este mes"
           value="18"
           sub="pacientes nuevos"
-          color="var(--purple)"
-          colorBg="var(--purple-bg)"
+          iconClass="icon-p"
+          glowClass="glow-p"
           trend="+6 vs mes ant."
         />
         <MetricCard
-          icon={<Clock size={15} />}
+          icon={<Clock size={16} style={{ color: 'var(--amber)' }} />}
           label="Próximo turno"
           value="10:30"
           sub="Juan Ramírez · en 12 min"
-          color="var(--amber)"
-          colorBg="var(--amber-bg)"
+          iconClass="icon-a"
+          glowClass="glow-a"
         />
       </div>
 
@@ -82,7 +82,7 @@ export function Dashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: '14px' }}>
 
         {/* Agenda del día */}
-        <div style={card}>
+        <div className="card" style={{ padding: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
             <div>
               <h2 style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
@@ -109,6 +109,7 @@ export function Dashboard() {
                 <button
                   key={turno.id}
                   onClick={() => setDrawerTurno(turno)}
+                  className="agenda-item"
                   style={{
                     display: 'grid',
                     gridTemplateColumns: '52px 34px 1fr auto',
@@ -122,7 +123,6 @@ export function Dashboard() {
                     cursor: 'pointer',
                     textAlign: 'left',
                     fontFamily: 'inherit',
-                    transition: 'all 140ms ease',
                     width: '100%',
                   }}
                   onMouseEnter={e => {
@@ -164,7 +164,7 @@ export function Dashboard() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
 
           {/* Cobros */}
-          <div style={card}>
+          <div className="card" style={{ padding: '18px 20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
               <h3 style={sectionTitle}>Cobros del día</h3>
               <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--green)', fontVariantNumeric: 'tabular-nums' }}>
@@ -192,7 +192,7 @@ export function Dashboard() {
           </div>
 
           {/* Alertas */}
-          <div style={card}>
+          <div className="card" style={{ padding: '18px 20px' }}>
             <h3 style={{ ...sectionTitle, marginBottom: '12px' }}>Alertas</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <AlertItem icon={<MessageCircle size={13} />} color="var(--green)" bg="var(--green-bg)" text="WhatsApp enviado a 7 pacientes" />
@@ -202,7 +202,7 @@ export function Dashboard() {
           </div>
 
           {/* Chart */}
-          <div style={card}>
+          <div className="card" style={{ padding: '18px 20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
               <h3 style={sectionTitle}>Turnos / semana</h3>
               <span style={{ fontSize: '11px', color: 'var(--green)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '2px' }}>
@@ -276,27 +276,24 @@ export function Dashboard() {
 
 /* ── subcomponents ─────────────────────────────────────── */
 
-function MetricCard({ icon, label, value, sub, color, colorBg, trend }: {
+function MetricCard({ icon, label, value, sub, iconClass, glowClass, trend }: {
   icon: React.ReactNode; label: string; value: string; sub: string;
-  color: string; colorBg: string; trend?: string;
+  iconClass: string; glowClass: string; trend?: string;
 }) {
   return (
-    <div style={{
-      background: 'var(--surface)',
-      border: '1px solid var(--border)',
-      borderRadius: '10px',
-      padding: '18px 20px',
-      boxShadow: 'var(--shadow-sm)',
-      display: 'flex', flexDirection: 'column', gap: '0',
-    }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '14px' }}>
-        <div style={{
-          width: 32, height: 32, borderRadius: '8px',
-          background: colorBg,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: color,
-          flexShrink: 0,
-        }}>
+    <div
+      className={`card ${glowClass}`}
+      style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: '0' }}
+    >
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px' }}>
+        <div
+          className={iconClass}
+          style={{
+            width: 38, height: 38, borderRadius: '10px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+          }}
+        >
           {icon}
         </div>
         {trend && (
@@ -306,12 +303,8 @@ function MetricCard({ icon, label, value, sub, color, colorBg, trend }: {
         )}
       </div>
 
-      <div style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '6px' }}>
-        {label}
-      </div>
-      <div style={{ fontSize: '26px', fontWeight: 600, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.03em', lineHeight: 1, marginBottom: '5px' }}>
-        {value}
-      </div>
+      <div className="section-label" style={{ marginBottom: '6px' }}>{label}</div>
+      <div className="num-display" style={{ fontSize: '28px', marginBottom: '5px' }}>{value}</div>
       <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{sub}</div>
     </div>
   );
@@ -344,14 +337,6 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
     </div>
   );
 }
-
-const card: React.CSSProperties = {
-  background: 'var(--surface)',
-  border: '1px solid var(--border)',
-  borderRadius: '10px',
-  padding: '20px',
-  boxShadow: 'var(--shadow-sm)',
-};
 
 const sectionTitle: React.CSSProperties = {
   margin: 0,

@@ -3,15 +3,15 @@ import React from 'react';
 type BadgeVariant = 'confirmado' | 'en-consultorio' | 'pendiente' | 'cancelado' | 'atendido' | 'vigente' | 'vencida' | 'cobrado' | 'a-facturar';
 
 const variantStyles: Record<BadgeVariant, React.CSSProperties> = {
-  confirmado:       { background: 'var(--accent-green-glow)',  color: 'var(--accent-green)',  border: '1px solid rgba(0,200,83,0.25)' },
-  'en-consultorio': { background: 'var(--accent-yellow-glow)', color: 'var(--accent-yellow)', border: '1px solid rgba(212,224,0,0.25)' },
-  pendiente:        { background: 'var(--accent-blue-glow)',   color: 'var(--accent-blue)',   border: '1px solid rgba(79,126,240,0.25)' },
-  cancelado:        { background: 'var(--accent-orange-glow)', color: 'var(--accent-orange)', border: '1px solid rgba(240,79,44,0.25)' },
-  atendido:         { background: 'rgba(122,122,140,0.12)',    color: 'var(--text-secondary)', border: '1px solid rgba(122,122,140,0.2)' },
-  vigente:          { background: 'var(--accent-green-glow)',  color: 'var(--accent-green)',  border: '1px solid rgba(0,200,83,0.25)' },
-  vencida:          { background: 'var(--accent-orange-glow)', color: 'var(--accent-orange)', border: '1px solid rgba(240,79,44,0.25)' },
-  cobrado:          { background: 'var(--accent-green-glow)',  color: 'var(--accent-green)',  border: '1px solid rgba(0,200,83,0.25)' },
-  'a-facturar':     { background: 'var(--accent-blue-glow)',   color: 'var(--accent-blue)',   border: '1px solid rgba(79,126,240,0.25)' },
+  confirmado:        { background: 'var(--green-bg)',  color: 'var(--green)',  border: '1px solid var(--green-border)' },
+  'en-consultorio':  { background: 'var(--blue-bg)',   color: 'var(--blue)',   border: '1px solid var(--blue-border)' },
+  pendiente:         { background: 'var(--amber-bg)',  color: 'var(--amber)',  border: '1px solid var(--amber-border)' },
+  cancelado:         { background: 'var(--red-bg)',    color: 'var(--red)',    border: '1px solid var(--red-border)' },
+  atendido:          { background: 'var(--surface-raised)', color: 'var(--text-secondary)', border: '1px solid var(--border)' },
+  vigente:           { background: 'var(--green-bg)',  color: 'var(--green)',  border: '1px solid var(--green-border)' },
+  vencida:           { background: 'var(--red-bg)',    color: 'var(--red)',    border: '1px solid var(--red-border)' },
+  cobrado:           { background: 'var(--green-bg)',  color: 'var(--green)',  border: '1px solid var(--green-border)' },
+  'a-facturar':      { background: 'var(--purple-bg)', color: 'var(--purple)', border: '1px solid var(--purple-border)' },
 };
 
 const labels: Record<BadgeVariant, string> = {
@@ -36,18 +36,18 @@ export function Badge({ variant, label }: BadgeProps) {
     <span style={{
       ...variantStyles[variant],
       borderRadius: '6px',
-      padding: '3px 8px',
+      padding: '3px 9px',
       fontSize: '11px',
       fontWeight: 600,
-      letterSpacing: '0.01em',
+      letterSpacing: '0.02em',
       display: 'inline-flex',
       alignItems: 'center',
-      gap: '4px',
+      gap: '5px',
       whiteSpace: 'nowrap',
     }}>
       <span style={{
         width: 5, height: 5, borderRadius: '50%',
-        background: 'currentColor', opacity: 0.8, flexShrink: 0,
+        background: 'currentColor', flexShrink: 0,
       }} />
       {label ?? labels[variant]}
     </span>

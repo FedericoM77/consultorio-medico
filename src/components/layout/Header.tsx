@@ -12,7 +12,9 @@ export function Header() {
     <header style={{
       position: 'fixed', top: 0, left: 0, right: 0, zIndex: 60,
       height: 48,
-      background: 'var(--surface)',
+      background: theme === 'dark' ? 'rgba(8,12,20,0.85)' : 'rgba(255,255,255,0.9)',
+      backdropFilter: 'blur(12px)',
+      WebkitBackdropFilter: 'blur(12px)',
       borderBottom: '1px solid var(--border)',
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       padding: '0 20px',

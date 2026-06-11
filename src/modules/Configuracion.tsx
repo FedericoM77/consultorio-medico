@@ -95,7 +95,7 @@ export function Configuracion() {
 
       {/* Consultorio */}
       {tab === 'consultorio' && (
-        <div style={cardSt}>
+        <div className="card" style={cardSt}>
           <h3 style={h3St}>Datos del consultorio</h3>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
             <FormField label="Nombre del consultorio">
@@ -128,7 +128,7 @@ export function Configuracion() {
 
       {/* Médico */}
       {tab === 'medico' && (
-        <div style={cardSt}>
+        <div className="card" style={cardSt}>
           <h3 style={h3St}>Datos del médico</h3>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
             <FormField label="Nombre completo">
@@ -161,7 +161,7 @@ export function Configuracion() {
 
       {/* Agenda */}
       {tab === 'agenda' && (
-        <div style={cardSt}>
+        <div className="card" style={cardSt}>
           <h3 style={h3St}>Configuración de agenda</h3>
 
           <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
@@ -222,7 +222,7 @@ export function Configuracion() {
 
       {/* Notificaciones */}
       {tab === 'notificaciones' && (
-        <div style={cardSt}>
+        <div className="card" style={cardSt}>
           <h3 style={h3St}>Notificaciones automáticas</h3>
 
           <Toggle
@@ -262,7 +262,7 @@ export function Configuracion() {
       {/* Plan */}
       {tab === 'plan' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <div style={{
+          <div className="card" style={{
             ...cardSt,
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           }}>
@@ -277,7 +277,7 @@ export function Configuracion() {
             <Button variant="primary" onClick={() => setModalPlan(true)}>Ver planes</Button>
           </div>
 
-          <div style={cardSt}>
+          <div className="card" style={cardSt}>
             <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               Incluido en tu plan
             </div>
@@ -370,10 +370,8 @@ function FormField({ label, children }: { label: string; children: React.ReactNo
 }
 
 const cardSt: React.CSSProperties = {
-  background: 'var(--surface)', border: '1px solid var(--border)',
-  borderRadius: '10px', padding: '24px',
+  padding: '24px',
   display: 'flex', flexDirection: 'column', gap: '16px',
-  boxShadow: 'var(--shadow-sm)',
 };
 
 const h3St: React.CSSProperties = {

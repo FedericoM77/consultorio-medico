@@ -235,10 +235,7 @@ export function Agenda() {
 
 function DiaView({ turnos, onClickTurno }: { turnos: Turno[]; onClickTurno: (t: Turno) => void }) {
   return (
-    <div style={{
-      background: 'var(--surface)', border: '1px solid var(--border)',
-      borderRadius: '10px', overflow: 'hidden', boxShadow: 'var(--shadow-sm)',
-    }}>
+    <div className="card" style={{ overflow: 'hidden' }}>
       <div style={{ position: 'relative' }}>
         {HORAS.map(hora => (
           <div
@@ -297,10 +294,7 @@ function SemanaView({ turnos, onClickTurno }: { turnos: Turno[]; onClickTurno: (
   const diasFechas = ['2026-06-09', '2026-06-10', '2026-06-11', '2026-06-12', '2026-06-13'];
 
   return (
-    <div style={{
-      background: 'var(--surface)', border: '1px solid var(--border)',
-      borderRadius: '10px', overflow: 'auto', boxShadow: 'var(--shadow-sm)',
-    }}>
+    <div className="card" style={{ overflow: 'auto' }}>
       <div style={{ display: 'grid', gridTemplateColumns: '64px repeat(5, 1fr)', minWidth: 700 }}>
         <div style={{ background: 'var(--surface-raised)', borderBottom: '1px solid var(--border)', padding: '8px' }} />
         {DIAS.map(dia => (

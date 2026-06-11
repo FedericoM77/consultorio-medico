@@ -78,12 +78,7 @@ export function Pacientes() {
         </div>
 
         {/* Cabecera paciente */}
-        <div style={{
-          background: 'var(--surface)', border: '1px solid var(--border)',
-          borderRadius: '10px', padding: '24px',
-          display: 'flex', alignItems: 'center', gap: '20px',
-          boxShadow: 'var(--shadow-sm)',
-        }}>
+        <div className="card" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '20px' }}>
           <Avatar nombre={`${fichaPaciente.nombre} ${fichaPaciente.apellido}`} size={60} />
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: '20px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px', letterSpacing: '-0.02em' }}>
@@ -150,12 +145,7 @@ export function Pacientes() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {consultasPaciente.length === 0 && <EmptyState text="Sin consultas registradas" />}
             {consultasPaciente.map(c => (
-              <div key={c.id} style={{
-                background: 'var(--surface)', border: '1px solid var(--border)',
-                borderRadius: '10px', padding: '20px',
-                display: 'grid', gridTemplateColumns: '120px 1fr', gap: '16px',
-                boxShadow: 'var(--shadow-sm)',
-              }}>
+              <div key={c.id} className="card" style={{ padding: '20px', display: 'grid', gridTemplateColumns: '120px 1fr', gap: '16px' }}>
                 <div>
                   <div style={{ fontSize: '12px', fontWeight: 500, color: 'var(--blue)' }}>{c.fecha}</div>
                   {c.cie10 && <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>CIE-10: {c.cie10}</div>}
@@ -182,10 +172,7 @@ export function Pacientes() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {recetasPaciente.length === 0 && <EmptyState text="Sin recetas" />}
             {recetasPaciente.map(r => (
-              <div key={r.id} style={{
-                background: 'var(--surface)', border: '1px solid var(--border)',
-                borderRadius: '10px', padding: '20px', boxShadow: 'var(--shadow-sm)',
-              }}>
+              <div key={r.id} className="card" style={{ padding: '20px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                   <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{r.fecha}</span>
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -295,10 +282,7 @@ export function Pacientes() {
       </div>
 
       {/* Tabla */}
-      <div style={{
-        background: 'var(--surface)', border: '1px solid var(--border)',
-        borderRadius: '10px', overflow: 'hidden', boxShadow: 'var(--shadow-sm)',
-      }}>
+      <div className="card" style={{ overflow: 'hidden' }}>
         <div style={{
           display: 'grid', gridTemplateColumns: '2fr 60px 140px 120px 80px 40px',
           padding: '10px 20px',
@@ -319,15 +303,13 @@ export function Pacientes() {
             <button
               key={p.id}
               onClick={() => setFichaPaciente(p)}
+              className="row-hover"
               style={{
                 display: 'grid', gridTemplateColumns: '2fr 60px 140px 120px 80px 40px',
                 padding: '13px 20px', width: '100%', textAlign: 'left',
                 background: 'none', border: 'none', borderBottom: '1px solid var(--border-subtle)',
                 cursor: 'pointer', fontFamily: 'inherit', alignItems: 'center',
-                transition: 'background 140ms ease',
               }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-raised)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'none')}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Avatar nombre={`${p.nombre} ${p.apellido}`} size={30} />

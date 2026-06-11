@@ -14,7 +14,11 @@ interface ToastProps {
 
 export function Toast({ toasts, onRemove }: ToastProps) {
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2">
+    <div style={{
+      position: 'fixed', bottom: 24, right: 24, zIndex: 200,
+      display: 'flex', flexDirection: 'column', gap: '8px',
+      pointerEvents: 'none',
+    }}>
       {toasts.map(toast => (
         <ToastItem key={toast.id} toast={toast} onRemove={onRemove} />
       ))}
@@ -28,31 +32,44 @@ function ToastItem({ toast, onRemove }: { toast: ToastData; onRemove: (id: strin
     return () => clearTimeout(timer);
   }, [toast.id, onRemove]);
 
+  const iconColor = toast.type === 'success' ? 'var(--green)' : toast.type === 'error' ? 'var(--red)' : 'var(--blue)';
   const icon = toast.type === 'success'
-    ? <CheckCircle size={16} style={{ color: 'var(--accent-green)' }} />
+    ? <CheckCircle size={15} />
     : toast.type === 'error'
-    ? <XCircle size={16} style={{ color: 'var(--accent-orange)' }} />
-    : <Info size={16} style={{ color: 'var(--accent-blue)' }} />;
+    ? <XCircle size={15} />
+    : <Info size={15} />;
 
   return (
     <div
+      className="anim-toast"
       style={{
-        background: 'var(--bg-card)',
+        background: 'var(--surface-raised)',
         border: '1px solid var(--border)',
         color: 'var(--text-primary)',
-        borderRadius: '8px',
+        borderRadius: '10px',
         padding: '12px 16px',
         display: 'flex',
         alignItems: 'center',
         gap: '10px',
         minWidth: '280px',
         maxWidth: '360px',
-        boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
-        animation: 'fadeIn 150ms ease',
+        boxShadow: 'var(--shadow-lg)',
+        pointerEvents: 'auto',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
       }}
     >
-      {icon}
-      <span style={{ fontSize: '13px', fontWeight: 500 }}>{toast.message}</span>
+      <span style={{ color: iconColor, flexShrink: 0, display: 'flex' }}>{icon}</span>
+      <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-primary)', flex: 1 }}>{toast.message}</span>
+      <button
+        onClick={() => onRemove(toast.id)}
+        style={{
+          background: 'none', border: 'none', cursor: 'pointer',
+          color: 'var(--text-muted)', padding: '0', flexShrink: 0,
+          display: 'flex', alignItems: 'center',
+          fontSize: '14px', lineHeight: 1,
+        }}
+      >✕</button>
     </div>
   );
 }

@@ -99,10 +99,7 @@ export function HistoriaClinica() {
       </div>
 
       {/* Lista */}
-      <div style={{
-        background: 'var(--surface)', border: '1px solid var(--border)',
-        borderRadius: '10px', overflow: 'hidden', boxShadow: 'var(--shadow-sm)',
-      }}>
+      <div className="card" style={{ overflow: 'hidden' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '100px 160px 1fr 200px', padding: '10px 20px', borderBottom: '1px solid var(--border)', background: 'var(--surface-raised)' }}>
           {['Fecha', 'Paciente', 'Diagnóstico', 'Indicaciones'].map(h => (
             <span key={h} style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</span>
@@ -115,15 +112,13 @@ export function HistoriaClinica() {
             <button
               key={c.id}
               onClick={() => { setDetalle(c); setNotasEdit(c.indicaciones); setEditandoNotas(false); }}
+              className="row-hover"
               style={{
                 display: 'grid', gridTemplateColumns: '100px 160px 1fr 200px',
                 padding: '12px 20px', width: '100%', textAlign: 'left',
                 background: 'none', border: 'none', borderBottom: '1px solid var(--border-subtle)',
                 cursor: 'pointer', fontFamily: 'inherit', alignItems: 'center',
-                transition: 'background 140ms ease',
               }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-raised)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'none')}
             >
               <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{c.fecha}</span>
               <span style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{p?.nombre} {p?.apellido}</span>
