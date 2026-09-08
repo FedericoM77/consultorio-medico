@@ -10,6 +10,7 @@ import { Facturacion } from './modules/Facturacion';
 import { HistoriaClinica } from './modules/HistoriaClinica';
 import { Estadisticas } from './modules/Estadisticas';
 import { Configuracion } from './modules/Configuracion';
+import { Auth, AuthSession } from './modules/Auth';
 import { ModuloActivo } from './types';
 
 const titulos: Record<ModuloActivo, string> = {
@@ -25,10 +26,15 @@ const titulos: Record<ModuloActivo, string> = {
 
 function AppContent() {
   const [modulo, setModulo] = useState<ModuloActivo>('dashboard');
+  const [session, setSession] = useState<AuthSession | null>(null);
+
+  if (!session) {
+    return <Auth onAuth={setSession} />;
+  }
 
   return (
     <div style={{ background: 'var(--canvas)', minHeight: '100vh', color: 'var(--text-primary)' }}>
-      <Header />
+      <Header session={session} onLogout={() => setSession(null)} />
       <Sidebar activo={modulo} onChange={setModulo} />
 
       <main style={{

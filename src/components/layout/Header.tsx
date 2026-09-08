@@ -1,10 +1,16 @@
 import React from 'react';
-import { Moon, Sun, Bell, ChevronDown } from 'lucide-react';
+import { LogOut, Moon, Sun, Bell, ChevronDown } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { AuthSession } from '../../modules/Auth';
 
-export function Header() {
+interface HeaderProps {
+  session: AuthSession;
+  onLogout: () => void;
+}
+
+export function Header({ session, onLogout }: HeaderProps) {
   const { theme, toggleTheme } = useTheme();
   const today = format(new Date(), "d MMM yyyy", { locale: es });
 
@@ -35,7 +41,7 @@ export function Header() {
         </div>
         <div>
           <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
-            Centro Médico Belgrano
+            {session.consultorio}
           </span>
         </div>
       </div>
@@ -80,14 +86,18 @@ export function Header() {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: '10px', fontWeight: 700, letterSpacing: '0.02em',
           }}>
-            MG
+            {session.iniciales}
           </div>
           <div style={{ textAlign: 'left' }}>
-            <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>Dra. García</div>
-            <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Clínica Médica</div>
+            <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>{session.medico}</div>
+            <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{session.especialidad}</div>
           </div>
           <ChevronDown size={13} style={{ color: 'var(--text-muted)' }} />
         </button>
+
+        <IconBtn onClick={onLogout} title="Cerrar sesión">
+          <LogOut size={15} />
+        </IconBtn>
       </div>
     </header>
   );
