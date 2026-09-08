@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
-import { pacientes, turnos as turnosIniciales } from '../data/mockData';
+import { useClinicData } from '../context/ClinicDataContext';
 import { Badge } from '../components/ui/Badge';
 import { Avatar } from '../components/ui/Avatar';
 import { Modal } from '../components/ui/Modal';
 import { Drawer } from '../components/ui/Drawer';
 import { Button } from '../components/ui/Button';
-import { Turno } from '../types';
+import { EmptyState } from '../components/ui/EmptyState';
+import { Paciente, Turno } from '../types';
 import { useToast } from '../components/ui/Toast';
 import { Toast } from '../components/ui/Toast';
 
@@ -37,6 +38,7 @@ const estadoBorders: Record<string, string> = {
 };
 
 export function Agenda() {
+  const { pacientes, turnos: turnosIniciales, consultas } = useClinicData();
   const [vista, setVista] = useState<Vista>('dia');
   const [turnos, setTurnos] = useState<Turno[]>(turnosIniciales);
   const [drawerTurno, setDrawerTurno] = useState<Turno | null>(null);
@@ -111,9 +113,9 @@ export function Agenda() {
       </div>
 
       {vista === 'dia' ? (
-        <DiaView turnos={turnosHoy} onClickTurno={setDrawerTurno} />
+        <DiaView pacientes={pacientes} turnos={turnosHoy} onClickTurno={setDrawerTurno} />
       ) : (
-        <SemanaView turnos={turnos} onClickTurno={setDrawerTurno} />
+        <SemanaView pacientes={pacientes} turnos={turnos} onClickTurno={setDrawerTurno} />
       )}
 
       {/* Drawer detalle */}
@@ -145,14 +147,15 @@ export function Agenda() {
               <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Últimas consultas
               </div>
-              {['03/06/2026 — Control HTA', '15/03/2026 — Control HTA + DBT', '20/01/2026 — Control anual']
-                .slice(0, drawerPaciente.id === 'p1' ? 3 : 0)
-                .map((c, i) => (
-                  <div key={i} style={{ fontSize: '12px', color: 'var(--text-secondary)', padding: '4px 0' }}>
-                    {c}
+              {consultas
+                .filter(c => c.pacienteId === drawerPaciente.id)
+                .slice(0, 3)
+                .map((c) => (
+                  <div key={c.id} style={{ fontSize: '12px', color: 'var(--text-secondary)', padding: '4px 0' }}>
+                    {c.fecha} — {c.motivo}
                   </div>
                 ))}
-              {drawerPaciente.id !== 'p1' && (
+              {consultas.filter(c => c.pacienteId === drawerPaciente.id).length === 0 && (
                 <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Sin consultas previas registradas</div>
               )}
             </div>
@@ -180,6 +183,11 @@ export function Agenda() {
                 <option key={p.id} value={p.id}>{p.nombre} {p.apellido}</option>
               ))}
             </select>
+            {pacientes.length === 0 && (
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                Primero cargá un paciente para asignarle un turno.
+              </div>
+            )}
           </FormField>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
@@ -233,7 +241,7 @@ export function Agenda() {
   );
 }
 
-function DiaView({ turnos, onClickTurno }: { turnos: Turno[]; onClickTurno: (t: Turno) => void }) {
+function DiaView({ pacientes, turnos, onClickTurno }: { pacientes: Paciente[]; turnos: Turno[]; onClickTurno: (t: Turno) => void }) {
   return (
     <div className="card" style={{ overflow: 'hidden' }}>
       <div style={{ position: 'relative' }}>
@@ -285,12 +293,15 @@ function DiaView({ turnos, onClickTurno }: { turnos: Turno[]; onClickTurno: (t: 
             </div>
           </div>
         ))}
+        {turnos.length === 0 && (
+          <EmptyState title="Sin turnos cargados" text="La agenda de este consultorio todavía está vacía." />
+        )}
       </div>
     </div>
   );
 }
 
-function SemanaView({ turnos, onClickTurno }: { turnos: Turno[]; onClickTurno: (t: Turno) => void }) {
+function SemanaView({ pacientes, turnos, onClickTurno }: { pacientes: Paciente[]; turnos: Turno[]; onClickTurno: (t: Turno) => void }) {
   const diasFechas = ['2026-06-09', '2026-06-10', '2026-06-11', '2026-06-12', '2026-06-13'];
 
   return (

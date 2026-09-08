@@ -8,6 +8,11 @@ export interface AuthSession {
   consultorio: string;
   especialidad: string;
   iniciales: string;
+  dataProfile: 'demo' | 'empty';
+  direccion: string;
+  telefono: string;
+  matriculaNacional: string;
+  matriculaProvincial: string;
 }
 
 type AuthMode = 'login' | 'alta';
@@ -16,6 +21,8 @@ const SUPER_ADMIN = {
   email: 'superadmin@consultorio.com',
   password: 'admin123',
 };
+
+const USER_PASSWORD = 'demo123';
 
 const emptyAltaForm = {
   consultorio: '',
@@ -57,12 +64,53 @@ function initialsFromName(name: string) {
   return initials || 'CM';
 }
 
+function sessionForLogin(email: string, password: string): AuthSession | null {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  if (password !== USER_PASSWORD) {
+    return null;
+  }
+
+  if (normalizedEmail === 'mgarcia@centromedicobelgrano.com') {
+    return {
+      medico: 'Dra. María García',
+      email: normalizedEmail,
+      consultorio: 'Centro Médico Belgrano',
+      especialidad: 'Clínica Médica',
+      iniciales: 'MG',
+      dataProfile: 'demo',
+      direccion: 'Av. Cabildo 1425 Piso 2 Of. 8, CABA',
+      telefono: '11-4789-3300',
+      matriculaNacional: '98.765',
+      matriculaProvincial: 'BA-12345',
+    };
+  }
+
+  if (normalizedEmail === 'admin@consultoriosanmartin.com') {
+    return {
+      medico: 'Admin San Martín',
+      email: normalizedEmail,
+      consultorio: 'Consultorio San Martín',
+      especialidad: 'Administración',
+      iniciales: 'AS',
+      dataProfile: 'empty',
+      direccion: '',
+      telefono: '',
+      matriculaNacional: '',
+      matriculaProvincial: '',
+    };
+  }
+
+  return null;
+}
+
 export function Auth({ onAuth }: { onAuth: (session: AuthSession) => void }) {
   const [mode, setMode] = useState<AuthMode>('login');
   const [loginForm, setLoginForm] = useState({
     email: '',
     password: '',
   });
+  const [loginError, setLoginError] = useState('');
   const [superAdminForm, setSuperAdminForm] = useState({ email: '', password: '' });
   const [superAdminVerified, setSuperAdminVerified] = useState(false);
   const [superAdminError, setSuperAdminError] = useState('');
@@ -70,13 +118,15 @@ export function Auth({ onAuth }: { onAuth: (session: AuthSession) => void }) {
 
   function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    onAuth({
-      medico: 'Dra. María García',
-      email: loginForm.email,
-      consultorio: 'Centro Médico Belgrano',
-      especialidad: 'Clínica Médica',
-      iniciales: 'MG',
-    });
+    const session = sessionForLogin(loginForm.email, loginForm.password);
+
+    if (!session) {
+      setLoginError('Usuario o contraseña inválidos.');
+      return;
+    }
+
+    setLoginError('');
+    onAuth(session);
   }
 
   function handleSuperAdmin(e: React.FormEvent) {
@@ -101,6 +151,11 @@ export function Auth({ onAuth }: { onAuth: (session: AuthSession) => void }) {
       consultorio: altaForm.consultorio,
       especialidad: altaForm.especialidad,
       iniciales: initialsFromName(altaForm.medico),
+      dataProfile: 'empty',
+      direccion: altaForm.direccion,
+      telefono: altaForm.telefono,
+      matriculaNacional: altaForm.matricula,
+      matriculaProvincial: '',
     });
   }
 
@@ -131,7 +186,7 @@ export function Auth({ onAuth }: { onAuth: (session: AuthSession) => void }) {
             <Stethoscope size={18} />
           </div>
           <div>
-            <div style={{ fontSize: '14px', fontWeight: 700, letterSpacing: '-0.02em' }}>Centro Médico Belgrano</div>
+            <div style={{ fontSize: '14px', fontWeight: 700, letterSpacing: '-0.02em' }}>Consultorio Médico</div>
             <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Gestión clínica privada</div>
           </div>
         </div>
@@ -233,6 +288,18 @@ export function Auth({ onAuth }: { onAuth: (session: AuthSession) => void }) {
                   required
                 />
               </Field>
+              {loginError && (
+                <div style={{
+                  background: 'var(--red-bg)',
+                  border: '1px solid var(--red-border)',
+                  borderRadius: '8px',
+                  color: 'var(--red)',
+                  fontSize: '12px',
+                  padding: '10px 12px',
+                }}>
+                  {loginError}
+                </div>
+              )}
               <Button variant="primary" size="lg" style={{ justifyContent: 'center', width: '100%' }}>
                 Entrar <ArrowRight size={15} />
               </Button>

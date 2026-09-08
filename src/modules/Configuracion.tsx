@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { medicoInfo } from '../data/mockData';
+import { useClinicData } from '../context/ClinicDataContext';
 import { Button } from '../components/ui/Button';
 import { Modal } from '../components/ui/Modal';
 import { useToast, Toast } from '../components/ui/Toast';
@@ -16,6 +16,7 @@ const planesData = [
 ];
 
 export function Configuracion() {
+  const { medicoInfo } = useClinicData();
   const [tab, setTab] = useState<TabConf>('consultorio');
   const [modalPlan, setModalPlan] = useState(false);
   const { toasts, addToast, removeToast } = useToast();

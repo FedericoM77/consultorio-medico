@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Search, Plus, Edit2, Check } from 'lucide-react';
-import { pacientes, consultas as consultasIniciales } from '../data/mockData';
+import { useClinicData } from '../context/ClinicDataContext';
 import { Consulta } from '../types';
 import { Modal } from '../components/ui/Modal';
 import { Button } from '../components/ui/Button';
+import { EmptyState } from '../components/ui/EmptyState';
 import { useToast, Toast } from '../components/ui/Toast';
 
 export function HistoriaClinica() {
+  const { pacientes, consultas: consultasIniciales } = useClinicData();
   const [consultas, setConsultas] = useState<Consulta[]>(consultasIniciales);
   const [query, setQuery] = useState('');
   const [detalle, setDetalle] = useState<Consulta | null>(null);
@@ -129,6 +131,9 @@ export function HistoriaClinica() {
             </button>
           );
         })}
+        {filtradas.length === 0 && (
+          <EmptyState title="Sin consultas" text={query ? 'No hay resultados para la búsqueda.' : 'Este consultorio todavía no tiene historia clínica cargada.'} />
+        )}
       </div>
 
       {/* Modal detalle */}
@@ -223,6 +228,11 @@ export function HistoriaClinica() {
               <option value="">Seleccionar paciente…</option>
               {pacientes.map(p => <option key={p.id} value={p.id}>{p.nombre} {p.apellido}</option>)}
             </select>
+            {pacientes.length === 0 && (
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                Primero cargá un paciente para registrar una consulta.
+              </div>
+            )}
           </FormField>
 
           <FormField label="Motivo de consulta">

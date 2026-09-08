@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Plus, ChevronRight } from 'lucide-react';
-import { pacientes as pacientesIniciales, consultas, recetas, cobros } from '../data/mockData';
+import { useClinicData } from '../context/ClinicDataContext';
 import { Paciente } from '../types';
 import { Avatar } from '../components/ui/Avatar';
 import { Badge } from '../components/ui/Badge';
@@ -11,6 +11,7 @@ import { differenceInYears, parseISO } from 'date-fns';
 type TabFicha = 'historia' | 'recetas' | 'cobros' | 'datos';
 
 export function Pacientes() {
+  const { pacientes: pacientesIniciales, consultas, recetas, cobros } = useClinicData();
   const [pacientes, setPacientes] = useState(pacientesIniciales);
   const [query, setQuery] = useState('');
   const [fichaPaciente, setFichaPaciente] = useState<Paciente | null>(null);
@@ -328,6 +329,9 @@ export function Pacientes() {
             </button>
           );
         })}
+        {filtrados.length === 0 && (
+          <EmptyState text={query ? 'Sin resultados para la búsqueda' : 'Sin pacientes cargados'} />
+        )}
       </div>
 
       {/* Modal nuevo paciente */}

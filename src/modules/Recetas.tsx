@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { Plus, RefreshCw, Printer } from 'lucide-react';
-import { pacientes, recetas as recetasIniciales, medicoInfo } from '../data/mockData';
+import { useClinicData } from '../context/ClinicDataContext';
 import { Receta } from '../types';
 import { Badge } from '../components/ui/Badge';
 import { Modal } from '../components/ui/Modal';
 import { Button } from '../components/ui/Button';
+import { EmptyState } from '../components/ui/EmptyState';
 import { useToast, Toast } from '../components/ui/Toast';
 
-const cronicas = recetasIniciales.filter(r => r.esCronica);
-
 export function Recetas() {
+  const { pacientes, recetas: recetasIniciales, medicoInfo } = useClinicData();
   const [recetas, setRecetas] = useState<Receta[]>(recetasIniciales);
   const [modalNuevo, setModalNuevo] = useState(false);
   const [modalPreview, setModalPreview] = useState<Receta | null>(null);
@@ -56,6 +56,7 @@ export function Recetas() {
   }
 
   const getPaciente = (id: string) => pacientes.find(p => p.id === id);
+  const cronicas = recetas.filter(r => r.esCronica);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -119,6 +120,9 @@ export function Recetas() {
             </div>
           );
         })}
+        {recetas.length === 0 && (
+          <EmptyState title="Sin recetas cargadas" text="Todavía no hay recetas para este consultorio." />
+        )}
       </div>
 
       {/* Sección crónicas */}
@@ -156,6 +160,9 @@ export function Recetas() {
             </div>
           );
         })}
+        {cronicas.length === 0 && (
+          <EmptyState title="Sin medicación crónica" text="Las renovaciones aparecerán cuando cargues recetas crónicas." />
+        )}
       </div>
 
       {/* Modal nueva receta */}
@@ -242,7 +249,11 @@ export function Recetas() {
       {/* Modal preview receta */}
       <Modal open={!!modalPreview} onClose={() => setModalPreview(null)} title="Vista previa de receta">
         {modalPreview && (() => {
-          const p = getPaciente(modalPreview.pacienteId)!;
+          const p = getPaciente(modalPreview.pacienteId);
+          if (!p) {
+            return <EmptyState title="Paciente no encontrado" text="La receta no tiene un paciente asociado en este consultorio." />;
+          }
+
           return (
             <div style={{
               background: 'white', color: '#000', borderRadius: '8px', padding: '24px',
@@ -279,7 +290,7 @@ export function Recetas() {
               )}
 
               <div style={{ borderTop: '1px solid #000', paddingTop: '24px', marginTop: '24px', textAlign: 'right', fontSize: '12px', fontStyle: 'italic' }}>
-                Dra. María García — Clínica Médica
+                {medicoInfo.nombre} — {medicoInfo.especialidad}
               </div>
             </div>
           );
