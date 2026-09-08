@@ -10,7 +10,8 @@ import { Facturacion } from './modules/Facturacion';
 import { HistoriaClinica } from './modules/HistoriaClinica';
 import { Estadisticas } from './modules/Estadisticas';
 import { Configuracion } from './modules/Configuracion';
-import { Auth, AuthSession } from './modules/Auth';
+import { Auth } from './modules/Auth';
+import type { AuthSession } from './modules/Auth';
 import { ModuloActivo } from './types';
 
 const titulos: Record<ModuloActivo, string> = {

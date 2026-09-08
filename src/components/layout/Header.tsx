@@ -3,7 +3,7 @@ import { LogOut, Moon, Sun, Bell, ChevronDown } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { AuthSession } from '../../modules/Auth';
+import type { AuthSession } from '../../modules/Auth';
 
 interface HeaderProps {
   session: AuthSession;

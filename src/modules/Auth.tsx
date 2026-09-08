@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, Building2, Check, LockKeyhole, Mail, Stethoscope, UserRound } from 'lucide-react';
+import { ArrowRight, Building2, Check, LockKeyhole, Mail, ShieldCheck, Stethoscope, UserRound } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 
 export interface AuthSession {
@@ -11,6 +11,22 @@ export interface AuthSession {
 }
 
 type AuthMode = 'login' | 'alta';
+
+const SUPER_ADMIN = {
+  email: 'superadmin@consultorio.com',
+  password: 'admin123',
+};
+
+const emptyAltaForm = {
+  consultorio: '',
+  especialidad: '',
+  direccion: '',
+  telefono: '',
+  medico: '',
+  email: '',
+  matricula: '',
+  password: '',
+};
 
 const inputSt: React.CSSProperties = {
   width: '100%',
@@ -32,7 +48,11 @@ const labelSt: React.CSSProperties = {
 };
 
 function initialsFromName(name: string) {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
+  const ignoredTitles = new Set(['dr', 'dra', 'doctor', 'doctora']);
+  const parts = name.trim().split(/\s+/).filter(part => {
+    const normalized = part.normalize('NFD').replace(/[\u0300-\u036f.]/g, '').toLowerCase();
+    return normalized && !ignoredTitles.has(normalized);
+  });
   const initials = parts.slice(0, 2).map(part => part[0]?.toUpperCase()).join('');
   return initials || 'CM';
 }
@@ -40,19 +60,13 @@ function initialsFromName(name: string) {
 export function Auth({ onAuth }: { onAuth: (session: AuthSession) => void }) {
   const [mode, setMode] = useState<AuthMode>('login');
   const [loginForm, setLoginForm] = useState({
-    email: 'mgarcia@centromedicobelgrano.com',
-    password: 'demo123',
+    email: '',
+    password: '',
   });
-  const [altaForm, setAltaForm] = useState({
-    consultorio: 'Centro Médico Belgrano',
-    especialidad: 'Clínica Médica',
-    direccion: 'Av. Cabildo 1425 Piso 2 Of. 8, CABA',
-    telefono: '11-4789-3300',
-    medico: 'Dra. María García',
-    email: 'mgarcia@centromedicobelgrano.com',
-    matricula: 'MN 98.765',
-    password: 'demo123',
-  });
+  const [superAdminForm, setSuperAdminForm] = useState({ email: '', password: '' });
+  const [superAdminVerified, setSuperAdminVerified] = useState(false);
+  const [superAdminError, setSuperAdminError] = useState('');
+  const [altaForm, setAltaForm] = useState(emptyAltaForm);
 
   function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -63,6 +77,20 @@ export function Auth({ onAuth }: { onAuth: (session: AuthSession) => void }) {
       especialidad: 'Clínica Médica',
       iniciales: 'MG',
     });
+  }
+
+  function handleSuperAdmin(e: React.FormEvent) {
+    e.preventDefault();
+    const validEmail = superAdminForm.email.trim().toLowerCase() === SUPER_ADMIN.email;
+    const validPassword = superAdminForm.password === SUPER_ADMIN.password;
+
+    if (!validEmail || !validPassword) {
+      setSuperAdminError('Credenciales de super admin inválidas.');
+      return;
+    }
+
+    setSuperAdminVerified(true);
+    setSuperAdminError('');
   }
 
   function handleAlta(e: React.FormEvent) {
@@ -162,7 +190,7 @@ export function Auth({ onAuth }: { onAuth: (session: AuthSession) => void }) {
       }}>
         <div className="card anim-fade-up" style={{
           width: '100%',
-          maxWidth: mode === 'login' ? 420 : 760,
+          maxWidth: mode === 'login' || !superAdminVerified ? 420 : 760,
           padding: '24px',
           display: 'flex',
           flexDirection: 'column',
@@ -207,6 +235,46 @@ export function Auth({ onAuth }: { onAuth: (session: AuthSession) => void }) {
               </Field>
               <Button variant="primary" size="lg" style={{ justifyContent: 'center', width: '100%' }}>
                 Entrar <ArrowRight size={15} />
+              </Button>
+            </form>
+          ) : !superAdminVerified ? (
+            <form onSubmit={handleSuperAdmin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <h2 style={titleSt}>Validación super admin</h2>
+                <p style={copySt}>Solo usuarios administrativos pueden dar de alta un nuevo consultorio.</p>
+              </div>
+              <Field label="Usuario super admin" icon={<ShieldCheck size={14} />}>
+                <input
+                  type="email"
+                  value={superAdminForm.email}
+                  onChange={e => setSuperAdminForm(f => ({ ...f, email: e.target.value }))}
+                  style={inputSt}
+                  required
+                />
+              </Field>
+              <Field label="Contraseña" icon={<LockKeyhole size={14} />}>
+                <input
+                  type="password"
+                  value={superAdminForm.password}
+                  onChange={e => setSuperAdminForm(f => ({ ...f, password: e.target.value }))}
+                  style={inputSt}
+                  required
+                />
+              </Field>
+              {superAdminError && (
+                <div style={{
+                  background: 'var(--red-bg)',
+                  border: '1px solid var(--red-border)',
+                  borderRadius: '8px',
+                  color: 'var(--red)',
+                  fontSize: '12px',
+                  padding: '10px 12px',
+                }}>
+                  {superAdminError}
+                </div>
+              )}
+              <Button variant="primary" size="lg" style={{ justifyContent: 'center', width: '100%' }}>
+                Continuar <ArrowRight size={15} />
               </Button>
             </form>
           ) : (
