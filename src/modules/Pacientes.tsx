@@ -314,7 +314,7 @@ export function Pacientes() {
   return (
     <div className="module-stack" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Header */}
-      <div className="pacientes-toolbar responsive-toolbar" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+      <div className="pacientes-toolbar responsive-toolbar" style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
         <input
           ref={importInputRef}
           type="file"
@@ -322,9 +322,9 @@ export function Pacientes() {
           onChange={handleImportarPacientes}
           style={{ display: 'none' }}
         />
-        <div className="pacientes-search" style={{ flex: '1 1 260px', position: 'relative', minWidth: 0 }}>
-          <Search size={15} style={{
-            position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)',
+        <div className="pacientes-search" style={{ flex: '1 1 220px', position: 'relative', minWidth: 0 }}>
+          <Search size={14} style={{
+            position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)',
             color: 'var(--text-muted)',
           }} />
           <input
@@ -332,26 +332,26 @@ export function Pacientes() {
             value={query}
             onChange={e => setQuery(e.target.value)}
             style={{
-              width: '100%', paddingLeft: '36px', paddingRight: '12px',
-              paddingTop: '9px', paddingBottom: '9px',
+              width: '100%', paddingLeft: '32px', paddingRight: '10px',
+              paddingTop: '7px', paddingBottom: '7px',
               background: 'var(--surface)', border: '1px solid var(--border)',
-              borderRadius: '8px', fontSize: '13px', color: 'var(--text-primary)',
+              borderRadius: '8px', fontSize: '12px', color: 'var(--text-primary)',
               fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box',
               boxShadow: 'var(--shadow-sm)',
             }}
           />
         </div>
-        <Button variant="secondary" onClick={handleDescargarEjemplo}>
-          <FileSpreadsheet size={15} /> Ejemplo Excel
+        <Button variant="secondary" size="sm" onClick={handleDescargarEjemplo}>
+          <FileSpreadsheet size={14} /> Ejemplo Excel
         </Button>
-        <Button variant="secondary" onClick={() => importInputRef.current?.click()}>
-          <FileUp size={15} /> Importar Excel
+        <Button variant="secondary" size="sm" onClick={() => importInputRef.current?.click()}>
+          <FileUp size={14} /> Importar Excel
         </Button>
-        <Button variant="secondary" onClick={handleExportarPacientes}>
-          <Download size={15} /> Exportar pacientes
+        <Button variant="secondary" size="sm" onClick={handleExportarPacientes}>
+          <Download size={14} /> Exportar pacientes
         </Button>
-        <Button variant="primary" onClick={() => setModalNuevo(true)}>
-          <Plus size={15} /> Nuevo paciente
+        <Button variant="primary" size="sm" onClick={() => setModalNuevo(true)}>
+          <Plus size={14} /> Nuevo paciente
         </Button>
       </div>
 

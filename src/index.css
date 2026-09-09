@@ -369,7 +369,7 @@ textarea {
   }
 
   .pacientes-toolbar > button {
-    flex: 1 1 170px;
+    flex: 1 1 145px;
     justify-content: center;
   }
 }
