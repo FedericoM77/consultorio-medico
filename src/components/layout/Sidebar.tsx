@@ -27,6 +27,7 @@ export function Sidebar({ activo, onChange }: SidebarProps) {
 
   return (
     <aside
+      className="app-sidebar"
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
       style={{
@@ -47,6 +48,7 @@ export function Sidebar({ activo, onChange }: SidebarProps) {
         return (
           <button
             key={item.id}
+            className={`nav-item ${isActive ? 'nav-active' : ''}`}
             onClick={() => onChange(item.id)}
             title={!expanded ? item.label : undefined}
             style={{
@@ -100,7 +102,7 @@ export function Sidebar({ activo, onChange }: SidebarProps) {
       {/* Spacer + version */}
       <div style={{ flex: 1 }} />
       {expanded && (
-        <div style={{
+        <div className="sidebar-version" style={{
           padding: '8px 10px', fontSize: '10px',
           color: 'var(--text-muted)', letterSpacing: '0.03em',
         }}>

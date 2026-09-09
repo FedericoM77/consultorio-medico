@@ -1,27 +1,21 @@
 import React, { useState } from 'react';
 import { Calendar, DollarSign, Users, Clock, MessageCircle, AlertCircle, FileText, ArrowUpRight, ChevronRight } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { pacientes, turnos, cobros } from '../data/mockData';
+import { useClinicData } from '../context/ClinicDataContext';
 import { Badge } from '../components/ui/Badge';
 import { Avatar } from '../components/ui/Avatar';
 import { Drawer } from '../components/ui/Drawer';
 import { Button } from '../components/ui/Button';
+import { EmptyState } from '../components/ui/EmptyState';
 import { Turno } from '../types';
 
-const barData = [
-  { dia: 'Lun', turnos: 8 },
-  { dia: 'Mar', turnos: 11 },
-  { dia: 'Mié', turnos: 9 },
-  { dia: 'Jue', turnos: 10 },
-  { dia: 'Vie', turnos: 7 },
+const weekDays = [
+  { dia: 'Lun', fecha: '2026-06-09' },
+  { dia: 'Mar', fecha: '2026-06-10' },
+  { dia: 'Mié', fecha: '2026-06-11' },
+  { dia: 'Jue', fecha: '2026-06-12' },
+  { dia: 'Vie', fecha: '2026-06-13' },
 ];
-
-const turnosHoy = turnos.filter(t => t.fecha === '2026-06-11');
-const cobrosHoy = cobros.filter(c => c.fecha === '2026-06-11');
-const totalCobradoHoy = cobrosHoy.filter(c => c.estado === 'cobrado').reduce((s, c) => s + c.monto, 0);
-const pendientesHoy = cobrosHoy.filter(c => c.estado === 'pendiente').length;
-const confirmados = turnosHoy.filter(t => t.estado === 'confirmado').length;
-const pendientesTurno = turnosHoy.filter(t => t.estado === 'pendiente').length;
 
 const statusBorderColor: Record<string, string> = {
   confirmado: 'var(--green)',
@@ -32,54 +26,70 @@ const statusBorderColor: Record<string, string> = {
 };
 
 export function Dashboard() {
+  const { dataProfile, pacientes, turnos, cobros, recetas } = useClinicData();
   const [drawerTurno, setDrawerTurno] = useState<Turno | null>(null);
+
+  const turnosHoy = turnos.filter(t => t.fecha === '2026-06-11');
+  const cobrosHoy = cobros.filter(c => c.fecha === '2026-06-11');
+  const totalCobradoHoy = cobrosHoy.filter(c => c.estado === 'cobrado').reduce((s, c) => s + c.monto, 0);
+  const pendientesHoy = cobrosHoy.filter(c => c.estado === 'pendiente').length;
+  const confirmados = turnosHoy.filter(t => t.estado === 'confirmado').length;
+  const pendientesTurno = turnosHoy.filter(t => t.estado === 'pendiente').length;
+  const proximoTurno = turnosHoy.find(t => t.estado !== 'cancelado' && t.estado !== 'atendido');
+  const proximoPaciente = proximoTurno ? pacientes.find(p => p.id === proximoTurno.pacienteId) : null;
+  const barData = weekDays.map(day => ({
+    dia: day.dia,
+    turnos: turnos.filter(t => t.fecha === day.fecha).length,
+  }));
+  const hasDemoAlerts = dataProfile === 'demo' && (pacientes.length > 0 || turnos.length > 0 || cobros.length > 0 || recetas.length > 0);
+
   const getPaciente = (id: string) => pacientes.find(p => p.id === id);
   const drawerPaciente = drawerTurno ? getPaciente(drawerTurno.pacienteId) : null;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="module-stack" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
       {/* Metric cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px' }}>
+      <div className="responsive-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px' }}>
         <MetricCard
           icon={<Calendar size={16} style={{ color: 'var(--blue)' }} />}
           label="Turnos hoy"
           value={String(turnosHoy.length)}
-          sub={`${confirmados} confirmados · ${pendientesTurno} pendientes`}
+          sub={turnosHoy.length ? `${confirmados} confirmados · ${pendientesTurno} pendientes` : 'Sin turnos cargados'}
           iconClass="icon-b"
           glowClass="glow-b"
-          trend="+2 vs ayer"
+          trend={turnosHoy.length ? '+2 vs ayer' : undefined}
         />
         <MetricCard
           icon={<DollarSign size={16} style={{ color: 'var(--green)' }} />}
           label="Cobrado hoy"
           value={`$${totalCobradoHoy.toLocaleString('es-AR')}`}
-          sub={`${pendientesHoy} pendientes de cobro`}
+          sub={cobrosHoy.length ? `${pendientesHoy} pendientes de cobro` : 'Sin movimientos'}
           iconClass="icon-g"
           glowClass="glow-g"
-          trend="+12% vs sem."
+          trend={cobrosHoy.length ? '+12% vs sem.' : undefined}
         />
         <MetricCard
           icon={<Users size={16} style={{ color: 'var(--purple)' }} />}
           label="Nuevos este mes"
-          value="18"
-          sub="pacientes nuevos"
+          value={String(pacientes.length)}
+          sub={pacientes.length ? 'pacientes cargados' : 'Sin pacientes'}
           iconClass="icon-p"
           glowClass="glow-p"
-          trend="+6 vs mes ant."
+          trend={pacientes.length ? '+6 vs mes ant.' : undefined}
         />
         <MetricCard
           icon={<Clock size={16} style={{ color: 'var(--amber)' }} />}
           label="Próximo turno"
-          value="10:30"
-          sub="Juan Ramírez · en 12 min"
+          value={proximoTurno?.hora ?? '—'}
+          sub={proximoTurno && proximoPaciente ? `${proximoPaciente.nombre} ${proximoPaciente.apellido}` : 'Sin turnos pendientes'}
           iconClass="icon-a"
           glowClass="glow-a"
         />
       </div>
 
       {/* Content row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: '14px' }}>
+      <div className="responsive-split" style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: '14px' }}>
 
         {/* Agenda del día */}
         <div className="card" style={{ padding: '20px' }}>
@@ -157,6 +167,9 @@ export function Dashboard() {
                 </button>
               );
             })}
+            {turnosHoy.length === 0 && (
+              <EmptyState title="Sin turnos para hoy" text="Este consultorio todavía no tiene agenda cargada." />
+            )}
           </div>
         </div>
 
@@ -188,49 +201,62 @@ export function Dashboard() {
                   </div>
                 );
               })}
+              {cobrosHoy.length === 0 && (
+                <EmptyState title="Sin cobros registrados" text="Cuando cargues movimientos van a aparecer acá." />
+              )}
             </div>
           </div>
 
           {/* Alertas */}
           <div className="card" style={{ padding: '18px 20px' }}>
             <h3 style={{ ...sectionTitle, marginBottom: '12px' }}>Alertas</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <AlertItem icon={<MessageCircle size={13} />} color="var(--green)" bg="var(--green-bg)" text="WhatsApp enviado a 7 pacientes" />
-              <AlertItem icon={<AlertCircle size={13} />} color="var(--red)" bg="var(--red-bg)" text="Cancelación — Roberto Sánchez" />
-              <AlertItem icon={<FileText size={13} />} color="var(--blue)" bg="var(--blue-bg)" text="2 recetas crónicas por renovar" />
-            </div>
+            {hasDemoAlerts ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <AlertItem icon={<MessageCircle size={13} />} color="var(--green)" bg="var(--green-bg)" text="WhatsApp enviado a 7 pacientes" />
+                <AlertItem icon={<AlertCircle size={13} />} color="var(--red)" bg="var(--red-bg)" text="Cancelación — Roberto Sánchez" />
+                <AlertItem icon={<FileText size={13} />} color="var(--blue)" bg="var(--blue-bg)" text="2 recetas crónicas por renovar" />
+              </div>
+            ) : (
+              <EmptyState title="Sin alertas" text="No hay actividad cargada para este consultorio." />
+            )}
           </div>
 
           {/* Chart */}
           <div className="card" style={{ padding: '18px 20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
               <h3 style={sectionTitle}>Turnos / semana</h3>
-              <span style={{ fontSize: '11px', color: 'var(--green)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '2px' }}>
-                <ArrowUpRight size={11} /> +8%
-              </span>
+              {turnos.length > 0 && (
+                <span style={{ fontSize: '11px', color: 'var(--green)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '2px' }}>
+                  <ArrowUpRight size={11} /> +8%
+                </span>
+              )}
             </div>
-            <ResponsiveContainer width="100%" height={80}>
-              <BarChart data={barData} margin={{ top: 0, right: 0, left: -28, bottom: 0 }} barSize={14}>
-                <XAxis dataKey="dia" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
-                <YAxis hide />
-                <Tooltip
-                  cursor={{ fill: 'var(--border-subtle)', radius: 4 }}
-                  contentStyle={{
-                    background: 'var(--surface)', border: '1px solid var(--border)',
-                    borderRadius: '8px', fontSize: '12px', boxShadow: 'var(--shadow-md)',
-                    color: 'var(--text-primary)',
-                  }}
-                />
-                <Bar dataKey="turnos" radius={[4, 4, 0, 0]} isAnimationActive={false}>
-                  {barData.map((entry, i) => (
-                    <Cell
-                      key={i}
-                      fill={entry.dia === 'Mié' ? 'var(--blue)' : 'var(--border)'}
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            {turnos.length > 0 ? (
+              <ResponsiveContainer width="100%" height={80}>
+                <BarChart data={barData} margin={{ top: 0, right: 0, left: -28, bottom: 0 }} barSize={14}>
+                  <XAxis dataKey="dia" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
+                  <YAxis hide />
+                  <Tooltip
+                    cursor={{ fill: 'var(--border-subtle)', radius: 4 }}
+                    contentStyle={{
+                      background: 'var(--surface)', border: '1px solid var(--border)',
+                      borderRadius: '8px', fontSize: '12px', boxShadow: 'var(--shadow-md)',
+                      color: 'var(--text-primary)',
+                    }}
+                  />
+                  <Bar dataKey="turnos" radius={[4, 4, 0, 0]} isAnimationActive={false}>
+                    {barData.map((entry, i) => (
+                      <Cell
+                        key={i}
+                        fill={entry.dia === 'Mié' ? 'var(--blue)' : 'var(--border)'}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <EmptyState title="Sin turnos semanales" text="El gráfico aparecerá cuando cargues agenda." />
+            )}
           </div>
         </div>
       </div>

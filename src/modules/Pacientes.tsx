@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Search, Plus, ChevronRight } from 'lucide-react';
-import { pacientes as pacientesIniciales, consultas, recetas, cobros } from '../data/mockData';
+import React, { useRef, useState } from 'react';
+import { Search, Plus, ChevronRight, Download, FileUp, FileSpreadsheet } from 'lucide-react';
+import { useClinicData } from '../context/ClinicDataContext';
 import { Paciente } from '../types';
 import { Avatar } from '../components/ui/Avatar';
 import { Badge } from '../components/ui/Badge';
@@ -11,7 +11,9 @@ import { differenceInYears, parseISO } from 'date-fns';
 type TabFicha = 'historia' | 'recetas' | 'cobros' | 'datos';
 
 export function Pacientes() {
+  const { pacientes: pacientesIniciales, consultas, recetas, cobros } = useClinicData();
   const [pacientes, setPacientes] = useState(pacientesIniciales);
+  const importInputRef = useRef<HTMLInputElement | null>(null);
   const [query, setQuery] = useState('');
   const [fichaPaciente, setFichaPaciente] = useState<Paciente | null>(null);
   const [modalNuevo, setModalNuevo] = useState(false);
@@ -52,15 +54,71 @@ export function Pacientes() {
     setNuevoForm({ nombre: '', apellido: '', dni: '', fechaNacimiento: '', obraSocial: '', telefono: '', email: '' });
   }
 
+  function descargarCsv(nombreArchivo: string, filas: string[][]) {
+    const csv = filas.map(fila => fila.map(escapeCsvCell).join(';')).join('\n');
+    const blob = new Blob([`\ufeff${csv}`], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = nombreArchivo;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  function handleExportarPacientes() {
+    descargarCsv('pacientes-consultorio.csv', [
+      columnasPacientes,
+      ...pacientes.map(p => [
+        p.nombre,
+        p.apellido,
+        p.dni,
+        p.fechaNacimiento,
+        p.obraSocial,
+        p.nroAfiliado || '',
+        p.telefono,
+        p.email || '',
+        p.antecedentes.join(', '),
+        p.alergias.join(', '),
+        p.medicacionCronica.join(', '),
+      ]),
+    ]);
+  }
+
+  function handleDescargarEjemplo() {
+    descargarCsv('ejemplo-importacion-pacientes.csv', [
+      columnasPacientes,
+      ['Ana', 'Martínez', '30111222', '1984-03-14', 'OSDE 210', '123456789', '11-4567-1234', 'ana.martinez@email.com', 'Hipertensión', 'Penicilina', 'Losartán 50mg'],
+      ['Juan', 'Pérez', '28777888', '1979-08-22', 'Particular', '', '11-5555-2020', 'juan.perez@email.com', '', '', ''],
+      ['Sofía', 'Herrera', '40999888', '1995-12-05', 'Swiss Medical', 'SM-778899', '11-6010-3344', '', 'Asma leve', 'Ibuprofeno', 'Salbutamol'],
+    ]);
+  }
+
+  function handleImportarPacientes(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const filas = parseCsv(String(reader.result));
+      const nuevos = filas.slice(1).map((fila, index) => pacienteDesdeFila(fila, index)).filter(Boolean) as Paciente[];
+      if (nuevos.length === 0) return;
+      setPacientes(prev => [...prev, ...nuevos]);
+      if (importInputRef.current) importInputRef.current.value = '';
+    };
+    reader.readAsText(file, 'utf-8');
+  }
+
   const consultasPaciente = fichaPaciente ? consultas.filter(c => c.pacienteId === fichaPaciente.id) : [];
   const recetasPaciente = fichaPaciente ? recetas.filter(r => r.pacienteId === fichaPaciente.id) : [];
   const cobrosPaciente = fichaPaciente ? cobros.filter(c => c.pacienteId === fichaPaciente.id) : [];
 
   if (fichaPaciente) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div className="module-stack" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         {/* Header ficha */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div className="responsive-toolbar" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
           <button
             onClick={() => setFichaPaciente(null)}
             style={{
@@ -78,13 +136,13 @@ export function Pacientes() {
         </div>
 
         {/* Cabecera paciente */}
-        <div className="card" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '20px' }}>
+        <div className="card patient-profile-card" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
           <Avatar nombre={`${fichaPaciente.nombre} ${fichaPaciente.apellido}`} size={60} />
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: '20px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px', letterSpacing: '-0.02em' }}>
               {fichaPaciente.nombre} {fichaPaciente.apellido}
             </div>
-            <div style={{ display: 'flex', gap: '20px', fontSize: '13px', color: 'var(--text-secondary)' }}>
+            <div style={{ display: 'flex', gap: '20px', fontSize: '13px', color: 'var(--text-secondary)', flexWrap: 'wrap' }}>
               <span>{edad(fichaPaciente.fechaNacimiento)} años</span>
               <span>{fichaPaciente.obraSocial}</span>
               <span>{fichaPaciente.telefono}</span>
@@ -220,7 +278,7 @@ export function Pacientes() {
         )}
 
         {tabFicha === 'datos' && (
-          <div style={{
+          <div className="responsive-form-grid" style={{
             background: 'var(--surface)', border: '1px solid var(--border)',
             borderRadius: '10px', padding: '24px',
             display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px',
@@ -254,12 +312,19 @@ export function Pacientes() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="module-stack" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <div style={{ flex: 1, position: 'relative' }}>
-          <Search size={15} style={{
-            position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)',
+      <div className="pacientes-toolbar responsive-toolbar" style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+        <input
+          ref={importInputRef}
+          type="file"
+          accept=".csv,text/csv"
+          onChange={handleImportarPacientes}
+          style={{ display: 'none' }}
+        />
+        <div className="pacientes-search" style={{ flex: '1 1 220px', position: 'relative', minWidth: 0 }}>
+          <Search size={14} style={{
+            position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)',
             color: 'var(--text-muted)',
           }} />
           <input
@@ -267,23 +332,33 @@ export function Pacientes() {
             value={query}
             onChange={e => setQuery(e.target.value)}
             style={{
-              width: '100%', paddingLeft: '36px', paddingRight: '12px',
-              paddingTop: '9px', paddingBottom: '9px',
+              width: '100%', paddingLeft: '32px', paddingRight: '10px',
+              paddingTop: '7px', paddingBottom: '7px',
               background: 'var(--surface)', border: '1px solid var(--border)',
-              borderRadius: '8px', fontSize: '13px', color: 'var(--text-primary)',
+              borderRadius: '8px', fontSize: '12px', color: 'var(--text-primary)',
               fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box',
               boxShadow: 'var(--shadow-sm)',
             }}
           />
         </div>
-        <Button variant="primary" onClick={() => setModalNuevo(true)}>
-          <Plus size={15} /> Nuevo paciente
+        <Button variant="secondary" size="sm" onClick={handleDescargarEjemplo}>
+          <FileSpreadsheet size={14} /> Ejemplo Excel
+        </Button>
+        <Button variant="secondary" size="sm" onClick={() => importInputRef.current?.click()}>
+          <FileUp size={14} /> Importar Excel
+        </Button>
+        <Button variant="secondary" size="sm" onClick={handleExportarPacientes}>
+          <Download size={14} /> Exportar pacientes
+        </Button>
+        <Button variant="primary" size="sm" onClick={() => setModalNuevo(true)}>
+          <Plus size={14} /> Nuevo paciente
         </Button>
       </div>
 
       {/* Tabla */}
-      <div className="card" style={{ overflow: 'hidden' }}>
-        <div style={{
+      <div className="card table-card" style={{ overflow: 'hidden' }}>
+        <div className="table-scroll">
+          <div className="pacientes-grid pacientes-grid-head" style={{
           display: 'grid', gridTemplateColumns: '2fr 60px 140px 120px 80px 40px',
           padding: '10px 20px',
           borderBottom: '1px solid var(--border)',
@@ -294,16 +369,16 @@ export function Pacientes() {
               {h}
             </span>
           ))}
-        </div>
+          </div>
 
-        {filtrados.map(p => {
+          {filtrados.map(p => {
           const consultasP = consultas.filter(c => c.pacienteId === p.id);
           const ultima = consultasP.sort((a, b) => b.fecha.localeCompare(a.fecha))[0];
           return (
             <button
               key={p.id}
               onClick={() => setFichaPaciente(p)}
-              className="row-hover"
+              className="row-hover pacientes-grid"
               style={{
                 display: 'grid', gridTemplateColumns: '2fr 60px 140px 120px 80px 40px',
                 padding: '13px 20px', width: '100%', textAlign: 'left',
@@ -327,13 +402,17 @@ export function Pacientes() {
               <ChevronRight size={16} style={{ color: 'var(--text-muted)' }} />
             </button>
           );
-        })}
+          })}
+          {filtrados.length === 0 && (
+            <EmptyState text={query ? 'Sin resultados para la búsqueda' : 'Sin pacientes cargados'} />
+          )}
+        </div>
       </div>
 
       {/* Modal nuevo paciente */}
       <Modal open={modalNuevo} onClose={() => setModalNuevo(false)} title="Nuevo paciente">
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="responsive-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <FormField label="Nombre">
               <input placeholder="Juan" value={nuevoForm.nombre} onChange={e => setNuevoForm(f => ({ ...f, nombre: e.target.value }))} style={inputSt} />
             </FormField>
@@ -341,7 +420,7 @@ export function Pacientes() {
               <input placeholder="García" value={nuevoForm.apellido} onChange={e => setNuevoForm(f => ({ ...f, apellido: e.target.value }))} style={inputSt} />
             </FormField>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="responsive-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <FormField label="DNI">
               <input placeholder="12.345.678" value={nuevoForm.dni} onChange={e => setNuevoForm(f => ({ ...f, dni: e.target.value }))} style={inputSt} />
             </FormField>
@@ -352,7 +431,7 @@ export function Pacientes() {
           <FormField label="Obra social">
             <input placeholder="OSDE, Swiss Medical, Particular…" value={nuevoForm.obraSocial} onChange={e => setNuevoForm(f => ({ ...f, obraSocial: e.target.value }))} style={inputSt} />
           </FormField>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="responsive-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <FormField label="Teléfono">
               <input placeholder="11-1234-5678" value={nuevoForm.telefono} onChange={e => setNuevoForm(f => ({ ...f, telefono: e.target.value }))} style={inputSt} />
             </FormField>
@@ -406,3 +485,86 @@ const inputSt: React.CSSProperties = {
   fontSize: '13px', color: 'var(--text-primary)',
   fontFamily: 'inherit', outline: 'none', width: '100%', boxSizing: 'border-box',
 };
+
+const columnasPacientes = [
+  'nombre',
+  'apellido',
+  'dni',
+  'fechaNacimiento',
+  'obraSocial',
+  'nroAfiliado',
+  'telefono',
+  'email',
+  'antecedentes',
+  'alergias',
+  'medicacionCronica',
+];
+
+function escapeCsvCell(value: string) {
+  const cell = value ?? '';
+  return /[;"\n]/.test(cell) ? `"${cell.replace(/"/g, '""')}"` : cell;
+}
+
+function parseCsv(text: string) {
+  const firstLine = text.split(/\r?\n/)[0] || '';
+  const delimiter = firstLine.includes(';') ? ';' : ',';
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let cell = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i += 1) {
+    const char = text[i];
+    const next = text[i + 1];
+
+    if (char === '"' && inQuotes && next === '"') {
+      cell += '"';
+      i += 1;
+    } else if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === delimiter && !inQuotes) {
+      row.push(cell.trim());
+      cell = '';
+    } else if ((char === '\n' || char === '\r') && !inQuotes) {
+      if (char === '\r' && next === '\n') i += 1;
+      row.push(cell.trim());
+      if (row.some(Boolean)) rows.push(row);
+      row = [];
+      cell = '';
+    } else {
+      cell += char;
+    }
+  }
+
+  row.push(cell.trim());
+  if (row.some(Boolean)) rows.push(row);
+
+  return rows;
+}
+
+function pacienteDesdeFila(fila: string[], index: number): Paciente | null {
+  const [nombre, apellido, dni, fechaNacimiento, obraSocial, nroAfiliado, telefono, email, antecedentes, alergias, medicacionCronica] = fila;
+  if (!nombre || !apellido) return null;
+
+  return {
+    id: `p-import-${Date.now()}-${index}`,
+    nombre,
+    apellido,
+    dni: dni || '',
+    fechaNacimiento: fechaNacimiento || '1990-01-01',
+    obraSocial: obraSocial || 'Particular',
+    nroAfiliado: nroAfiliado || undefined,
+    telefono: telefono || '',
+    email: email || undefined,
+    antecedentes: splitList(antecedentes),
+    alergias: splitList(alergias),
+    medicacionCronica: splitList(medicacionCronica),
+  };
+}
+
+function splitList(value?: string) {
+  return (value || '')
+    .split(',')
+    .map(item => item.trim())
+    .filter(Boolean);
+}

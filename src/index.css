@@ -110,6 +110,18 @@ body {
   margin: 0; padding: 0;
   background: var(--canvas);
   color: var(--text-primary);
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button,
+input,
+select,
+textarea {
+  max-width: 100%;
 }
 
 /* Ambient glow behind header area on dark mode */
@@ -239,3 +251,258 @@ body {
 .tabular-nums  { font-variant-numeric: tabular-nums; }
 .section-label { font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-muted); }
 .num-display   { font-size: 36px; font-weight: 700; letter-spacing: -0.04em; line-height: 1; font-variant-numeric: tabular-nums; color: var(--text-primary); }
+
+@media (max-width: 860px) {
+  .auth-shell {
+    grid-template-columns: 1fr !important;
+  }
+
+  .auth-hero {
+    border-right: none !important;
+    border-bottom: 1px solid var(--border);
+    min-height: auto;
+  }
+
+  .auth-panel-wrap {
+    align-items: flex-start !important;
+    padding: 20px !important;
+  }
+
+  .auth-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE APP
+═══════════════════════════════════════════ */
+.app-shell,
+.app-main,
+.module-stack {
+  min-width: 0;
+}
+
+.header-brand,
+.header-actions,
+.header-user {
+  min-width: 0;
+}
+
+.header-brand-name,
+.header-user-name,
+.header-user-meta {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.header-brand-name { max-width: min(340px, 34vw); }
+.header-user-name { max-width: 150px; }
+
+.responsive-toolbar {
+  min-width: 0;
+}
+
+.tabs-scroll {
+  scrollbar-width: none;
+}
+
+.tabs-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.tabs-scroll > button {
+  flex: 0 0 auto;
+}
+
+.table-card {
+  min-width: 0;
+}
+
+.table-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.pacientes-grid {
+  min-width: 720px;
+}
+
+.billing-grid {
+  min-width: 760px;
+}
+
+.liquidaciones-grid {
+  min-width: 520px;
+}
+
+.historia-grid {
+  min-width: 720px;
+}
+
+.recetas-grid {
+  min-width: 680px;
+}
+
+.recetas-cronicas-grid {
+  min-width: 420px;
+}
+
+@media (max-width: 1180px) {
+  .responsive-grid-5 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .responsive-grid-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .responsive-split,
+  .responsive-grid-2 {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .pacientes-toolbar .pacientes-search {
+    flex: 1 1 100% !important;
+  }
+
+  .pacientes-toolbar > button {
+    flex: 1 1 145px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    padding: 0 10px !important;
+    gap: 8px;
+  }
+
+  .header-brand {
+    flex: 1 1 auto;
+    overflow: hidden;
+  }
+
+  .header-brand-name {
+    max-width: none;
+  }
+
+  .header-date,
+  .header-user-meta,
+  .header-user svg {
+    display: none !important;
+  }
+
+  .header-user {
+    padding: 4px !important;
+  }
+
+  .header-user-text {
+    display: none;
+  }
+
+  .app-sidebar {
+    top: auto !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 58px !important;
+    border-right: none !important;
+    border-top: 1px solid var(--border);
+    flex-direction: row !important;
+    align-items: center;
+    padding: 8px !important;
+    overflow-x: auto !important;
+  }
+
+  .app-sidebar .nav-item {
+    min-width: 42px;
+    width: 42px !important;
+    height: 42px !important;
+    padding: 0 !important;
+    justify-content: center;
+  }
+
+  .app-sidebar .nav-item span:last-child,
+  .sidebar-version {
+    display: none !important;
+  }
+
+  .app-main {
+    margin-left: 0 !important;
+    padding: 18px 14px 84px !important;
+    max-width: 100vw !important;
+  }
+
+  .module-title-wrap {
+    margin-bottom: 16px !important;
+  }
+
+  .module-title {
+    font-size: 18px !important;
+  }
+
+  .card {
+    border-radius: 10px;
+  }
+
+  .responsive-grid-5,
+  .responsive-grid-4,
+  .responsive-grid-3,
+  .responsive-grid-2,
+  .responsive-split,
+  .responsive-form-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .responsive-toolbar {
+    align-items: stretch !important;
+  }
+
+  .responsive-toolbar > button {
+    justify-content: center;
+  }
+
+  .agenda-toolbar > div {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .segmented-actions > button {
+    flex: 1 1 88px;
+  }
+
+  .pacientes-toolbar > button {
+    flex: 1 1 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .app-header {
+    height: 52px !important;
+  }
+
+  .app-main {
+    margin-top: 52px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  .header-actions {
+    gap: 4px !important;
+  }
+
+  .pacientes-grid {
+    min-width: 640px;
+  }
+
+  .billing-grid {
+    min-width: 700px;
+  }
+
+  .historia-grid {
+    min-width: 660px;
+  }
+}

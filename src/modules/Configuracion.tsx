@@ -1,13 +1,25 @@
-import React, { useState } from 'react';
-import { medicoInfo } from '../data/mockData';
+import React, { useRef, useState } from 'react';
+import { Clock, Image as ImageIcon, Plus, Trash2, Upload, UserRound } from 'lucide-react';
+import { createDefaultHorarios, DIAS_ATENCION, useClinicData } from '../context/ClinicDataContext';
 import { Button } from '../components/ui/Button';
 import { Modal } from '../components/ui/Modal';
+import { EmptyState } from '../components/ui/EmptyState';
 import { useToast, Toast } from '../components/ui/Toast';
+import type { HorarioAtencion } from '../types';
 
-type TabConf = 'consultorio' | 'medico' | 'agenda' | 'notificaciones' | 'plan';
+type TabConf = 'consultorio' | 'medico' | 'medicos' | 'agenda' | 'notificaciones' | 'plan';
 
-const DIAS_SEMANA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+const DIAS_SEMANA = DIAS_ATENCION;
 const HORAS = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
+const COLORES_MEDICO = ['var(--blue)', 'var(--green)', 'var(--purple)', 'var(--amber)', 'var(--red)'];
+const NUEVO_MEDICO_INICIAL = {
+  nombre: '',
+  especialidad: '',
+  matricula: '',
+  email: '',
+  telefono: '',
+  color: 'var(--blue)',
+};
 
 const planesData = [
   { nombre: 'Básico', precio: '$29/mes', features: ['1 médico', 'Hasta 500 turnos/mes', 'Historia clínica', 'Recetas básicas'] },
@@ -16,8 +28,10 @@ const planesData = [
 ];
 
 export function Configuracion() {
+  const { medicoInfo, medicos, logoUrl, setLogoUrl, addMedico, updateMedicoHorarios } = useClinicData();
   const [tab, setTab] = useState<TabConf>('consultorio');
   const [modalPlan, setModalPlan] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement | null>(null);
   const { toasts, addToast, removeToast } = useToast();
 
   const [consultorioForm, setConsultorioForm] = useState({
@@ -45,6 +59,9 @@ export function Configuracion() {
     seguimiento: true,
   });
 
+  const [nuevoMedico, setNuevoMedico] = useState(NUEVO_MEDICO_INICIAL);
+  const [logoNombre, setLogoNombre] = useState('');
+
   const [horariosActivos, setHorariosActivos] = useState<Record<string, Set<string>>>(
     Object.fromEntries(DIAS_SEMANA.map(d => [d, new Set<string>(
       d !== 'Sáb' ? HORAS.slice(0, 8) : []
@@ -64,18 +81,84 @@ export function Configuracion() {
     addToast('Configuración guardada', 'success');
   }
 
+  function handleLogoChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      addToast('Subí un archivo de imagen válido', 'error');
+      return;
+    }
+
+    if (file.size > 1_500_000) {
+      addToast('Usá una imagen de hasta 1.5 MB', 'error');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setLogoUrl(String(reader.result));
+      setLogoNombre(file.name);
+      addToast('Logo actualizado', 'success');
+    };
+    reader.onerror = () => addToast('No se pudo leer el logo', 'error');
+    reader.readAsDataURL(file);
+  }
+
+  function handleQuitarLogo() {
+    setLogoUrl(null);
+    setLogoNombre('');
+    if (logoInputRef.current) logoInputRef.current.value = '';
+    addToast('Logo quitado', 'info');
+  }
+
+  function handleAgregarMedico() {
+    const nombre = nuevoMedico.nombre.trim();
+    const especialidad = nuevoMedico.especialidad.trim();
+
+    if (!nombre || !especialidad) {
+      addToast('Completá nombre y especialidad del médico', 'error');
+      return;
+    }
+
+    addMedico({
+      nombre,
+      especialidad,
+      matricula: nuevoMedico.matricula.trim(),
+      email: nuevoMedico.email.trim(),
+      telefono: nuevoMedico.telefono.trim(),
+      color: nuevoMedico.color,
+      horarios: createDefaultHorarios(),
+    });
+    setNuevoMedico(NUEVO_MEDICO_INICIAL);
+    addToast('Médico agregado a la agenda', 'success');
+  }
+
+  function updateHorarioMedico(medicoId: string, dia: string, cambios: Partial<HorarioAtencion>) {
+    const medico = medicos.find(m => m.id === medicoId);
+    if (!medico) return;
+
+    updateMedicoHorarios(
+      medicoId,
+      medico.horarios.map(horario => (
+        horario.dia === dia ? { ...horario, ...cambios } : horario
+      )),
+    );
+  }
+
   const tabs: { id: TabConf; label: string }[] = [
     { id: 'consultorio', label: 'Consultorio' },
     { id: 'medico', label: 'Médico' },
+    { id: 'medicos', label: 'Médicos' },
     { id: 'agenda', label: 'Agenda' },
     { id: 'notificaciones', label: 'Notificaciones' },
     { id: 'plan', label: 'Plan' },
   ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="module-stack" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '0', borderBottom: '1px solid var(--border)' }}>
+      <div className="tabs-scroll" style={{ display: 'flex', gap: '0', borderBottom: '1px solid var(--border)', overflowX: 'auto' }}>
         {tabs.map(t => (
           <button
             key={t.id}
@@ -97,7 +180,7 @@ export function Configuracion() {
       {tab === 'consultorio' && (
         <div className="card" style={cardSt}>
           <h3 style={h3St}>Datos del consultorio</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+          <div className="responsive-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
             <FormField label="Nombre del consultorio">
               <input value={consultorioForm.nombre} onChange={e => setConsultorioForm(f => ({ ...f, nombre: e.target.value }))} style={inpSt} />
             </FormField>
@@ -111,14 +194,64 @@ export function Configuracion() {
           <FormField label="Dirección">
             <input value={consultorioForm.direccion} onChange={e => setConsultorioForm(f => ({ ...f, direccion: e.target.value }))} style={inpSt} />
           </FormField>
-          <FormField label="Logo">
-            <button style={{
-              background: 'var(--surface-raised)', border: '2px dashed var(--border)',
-              borderRadius: '8px', padding: '20px', cursor: 'pointer',
-              fontSize: '12px', color: 'var(--text-secondary)', fontFamily: 'inherit',
+          <FormField label="Logo del encabezado">
+            <input
+              ref={logoInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/svg+xml"
+              onChange={handleLogoChange}
+              style={{ display: 'none' }}
+            />
+            <div style={{
+              background: 'var(--surface-raised)',
+              border: '1px solid var(--border)',
+              borderRadius: '8px',
+              padding: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '14px',
             }}>
-              + Subir logo del consultorio (simulado)
-            </button>
+              <div style={{
+                width: '58px',
+                height: '58px',
+                borderRadius: '12px',
+                border: '1px solid var(--border)',
+                background: 'var(--surface)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+                flexShrink: 0,
+              }}>
+                {logoUrl ? (
+                  <img
+                    src={logoUrl}
+                    alt="Logo del consultorio"
+                    style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '6px', boxSizing: 'border-box' }}
+                  />
+                ) : (
+                  <ImageIcon size={22} color="var(--text-muted)" />
+                )}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '3px' }}>
+                  {logoNombre || (logoUrl ? 'Logo cargado' : 'Sin logo cargado')}
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                  PNG, JPG, WebP o SVG · hasta 1.5 MB
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                <Button type="button" variant="secondary" onClick={() => logoInputRef.current?.click()}>
+                  <Upload size={14} /> Subir
+                </Button>
+                {logoUrl && (
+                  <Button type="button" variant="ghost" onClick={handleQuitarLogo}>
+                    <Trash2 size={14} /> Quitar
+                  </Button>
+                )}
+              </div>
+            </div>
           </FormField>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button variant="primary" onClick={handleGuardar}>Guardar cambios</Button>
@@ -130,7 +263,7 @@ export function Configuracion() {
       {tab === 'medico' && (
         <div className="card" style={cardSt}>
           <h3 style={h3St}>Datos del médico</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+          <div className="responsive-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
             <FormField label="Nombre completo">
               <input value={medicoForm.nombre} onChange={e => setMedicoForm(f => ({ ...f, nombre: e.target.value }))} style={inpSt} />
             </FormField>
@@ -159,12 +292,206 @@ export function Configuracion() {
         </div>
       )}
 
+      {/* Médicos */}
+      {tab === 'medicos' && (
+        <div className="responsive-grid-2" style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+          gap: '16px',
+          alignItems: 'start',
+        }}>
+          <div className="card" style={cardSt}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <UserRound size={17} color="var(--blue)" />
+              <h3 style={h3St}>Alta de médicos</h3>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
+              <FormField label="Nombre completo">
+                <input
+                  value={nuevoMedico.nombre}
+                  onChange={e => setNuevoMedico(f => ({ ...f, nombre: e.target.value }))}
+                  placeholder="Ej. Dra. Ana Pérez"
+                  style={inpSt}
+                />
+              </FormField>
+              <FormField label="Especialidad">
+                <input
+                  value={nuevoMedico.especialidad}
+                  onChange={e => setNuevoMedico(f => ({ ...f, especialidad: e.target.value }))}
+                  placeholder="Ej. Dermatología"
+                  style={inpSt}
+                />
+              </FormField>
+              <FormField label="Matrícula">
+                <input
+                  value={nuevoMedico.matricula}
+                  onChange={e => setNuevoMedico(f => ({ ...f, matricula: e.target.value }))}
+                  placeholder="MN 00.000"
+                  style={inpSt}
+                />
+              </FormField>
+              <FormField label="Teléfono">
+                <input
+                  value={nuevoMedico.telefono}
+                  onChange={e => setNuevoMedico(f => ({ ...f, telefono: e.target.value }))}
+                  placeholder="11-0000-0000"
+                  style={inpSt}
+                />
+              </FormField>
+            </div>
+
+            <FormField label="Email">
+              <input
+                value={nuevoMedico.email}
+                onChange={e => setNuevoMedico(f => ({ ...f, email: e.target.value }))}
+                placeholder="medico@consultorio.com"
+                style={inpSt}
+              />
+            </FormField>
+
+            <FormField label="Color en agenda">
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {COLORES_MEDICO.map(color => (
+                  <button
+                    key={color}
+                    aria-label={`Elegir color ${color}`}
+                    onClick={() => setNuevoMedico(f => ({ ...f, color }))}
+                    style={{
+                      width: '28px',
+                      height: '28px',
+                      borderRadius: '50%',
+                      cursor: 'pointer',
+                      background: color,
+                      border: nuevoMedico.color === color ? '2px solid var(--text-primary)' : '2px solid var(--border)',
+                      boxShadow: nuevoMedico.color === color ? '0 0 0 3px var(--blue-bg)' : 'none',
+                    }}
+                  />
+                ))}
+              </div>
+            </FormField>
+
+            <Button variant="primary" onClick={handleAgregarMedico} style={{ justifyContent: 'center' }}>
+              <Plus size={15} /> Agregar médico
+            </Button>
+          </div>
+
+          <div className="card" style={cardSt}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Clock size={17} color="var(--blue)" />
+              <h3 style={h3St}>Agenda por médico</h3>
+            </div>
+
+            {medicos.length === 0 ? (
+              <EmptyState
+                title="Sin médicos cargados"
+                text="Agregá un médico para definir sus horarios y verlo en la agenda macro."
+              />
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {medicos.map(medico => (
+                  <div
+                    key={medico.id}
+                    style={{
+                      border: '1px solid var(--border)',
+                      borderRadius: '8px',
+                      padding: '14px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '12px',
+                      background: 'var(--surface)',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                        <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: medico.color, flexShrink: 0 }} />
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                            {medico.nombre}
+                          </div>
+                          <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                            {medico.especialidad}{medico.matricula ? ` · ${medico.matricula}` : ''}
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+                        {medico.email || medico.telefono || 'Sin contacto'}
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '8px' }}>
+                      {medico.horarios.map(horario => (
+                        <div
+                          key={horario.dia}
+                          style={{
+                            display: 'grid',
+                            gridTemplateColumns: '34px 1fr 1fr 34px',
+                            gap: '8px',
+                            alignItems: 'center',
+                            padding: '8px',
+                            borderRadius: '7px',
+                            border: '1px solid var(--border-subtle)',
+                            background: horario.activo ? 'var(--surface-raised)' : 'transparent',
+                          }}
+                        >
+                          <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                            {horario.dia}
+                          </span>
+                          <input
+                            type="time"
+                            value={horario.desde}
+                            disabled={!horario.activo}
+                            onChange={e => updateHorarioMedico(medico.id, horario.dia, { desde: e.target.value })}
+                            style={miniInputSt}
+                          />
+                          <input
+                            type="time"
+                            value={horario.hasta}
+                            disabled={!horario.activo}
+                            onChange={e => updateHorarioMedico(medico.id, horario.dia, { hasta: e.target.value })}
+                            style={miniInputSt}
+                          />
+                          <button
+                            aria-label={`Activar ${horario.dia}`}
+                            onClick={() => updateHorarioMedico(medico.id, horario.dia, { activo: !horario.activo })}
+                            style={{
+                              width: '32px',
+                              height: '20px',
+                              borderRadius: '10px',
+                              border: 'none',
+                              background: horario.activo ? 'var(--blue)' : 'var(--border)',
+                              cursor: 'pointer',
+                              position: 'relative',
+                            }}
+                          >
+                            <span style={{
+                              width: '14px',
+                              height: '14px',
+                              borderRadius: '50%',
+                              background: '#fff',
+                              position: 'absolute',
+                              top: '3px',
+                              left: horario.activo ? '15px' : '3px',
+                              transition: 'left 120ms ease',
+                            }} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Agenda */}
       {tab === 'agenda' && (
         <div className="card" style={cardSt}>
           <h3 style={h3St}>Configuración de agenda</h3>
 
-          <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+          <div className="responsive-toolbar" style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
             <FormField label="Duración default de consulta">
               <select value={agendaForm.duracionDefault} onChange={e => setAgendaForm(f => ({ ...f, duracionDefault: e.target.value }))} style={{ ...inpSt, width: '160px' }}>
                 {['15', '20', '30', '45', '60'].map(v => <option key={v} value={v}>{v} min</option>)}
@@ -292,7 +619,7 @@ export function Configuracion() {
 
       {/* Modal planes */}
       <Modal open={modalPlan} onClose={() => setModalPlan(false)} title="Elegir plan" maxWidth={720}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px' }}>
+        <div className="responsive-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px' }}>
           {planesData.map(p => (
             <div
               key={p.nombre}
@@ -383,4 +710,10 @@ const inpSt: React.CSSProperties = {
   borderRadius: '8px', padding: '9px 12px',
   fontSize: '13px', color: 'var(--text-primary)',
   fontFamily: 'inherit', outline: 'none', width: '100%', boxSizing: 'border-box',
+};
+
+const miniInputSt: React.CSSProperties = {
+  ...inpSt,
+  padding: '6px 8px',
+  fontSize: '11px',
 };
