@@ -17,7 +17,7 @@ export function Header({ session, onLogout }: HeaderProps) {
   const today = format(new Date(), "d MMM yyyy", { locale: es });
 
   return (
-    <header style={{
+    <header className="app-header" style={{
       position: 'fixed', top: 0, left: 0, right: 0, zIndex: 60,
       height: 48,
       background: theme === 'dark' ? 'rgba(8,12,20,0.85)' : 'rgba(255,255,255,0.9)',
@@ -28,7 +28,7 @@ export function Header({ session, onLogout }: HeaderProps) {
       padding: '0 20px',
     }}>
       {/* Brand */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div className="header-brand" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         <div style={{
           width: 28, height: 28, borderRadius: '8px',
           background: logoUrl ? 'var(--surface-raised)' : 'var(--blue)',
@@ -52,16 +52,16 @@ export function Header({ session, onLogout }: HeaderProps) {
             </svg>
           )}
         </div>
-        <div>
-          <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+        <div style={{ minWidth: 0 }}>
+          <span className="header-brand-name" style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
             {session.consultorio}
           </span>
         </div>
       </div>
 
       {/* Right controls */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-        <span style={{ fontSize: '12px', color: 'var(--text-muted)', marginRight: '8px', textTransform: 'capitalize' }}>
+      <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <span className="header-date" style={{ fontSize: '12px', color: 'var(--text-muted)', marginRight: '8px', textTransform: 'capitalize' }}>
           {today}
         </span>
 
@@ -82,7 +82,7 @@ export function Header({ session, onLogout }: HeaderProps) {
         <div style={{ width: 1, height: 20, background: 'var(--border)', margin: '0 4px' }} />
 
         {/* User */}
-        <button style={{
+        <button className="header-user" style={{
           display: 'flex', alignItems: 'center', gap: '8px',
           background: 'transparent', border: 'none', cursor: 'pointer',
           padding: '4px 8px', borderRadius: '7px', fontFamily: 'inherit',
@@ -101,9 +101,9 @@ export function Header({ session, onLogout }: HeaderProps) {
           }}>
             {session.iniciales}
           </div>
-          <div style={{ textAlign: 'left' }}>
-            <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>{session.medico}</div>
-            <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{session.especialidad}</div>
+          <div className="header-user-text" style={{ textAlign: 'left', minWidth: 0 }}>
+            <div className="header-user-name" style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>{session.medico}</div>
+            <div className="header-user-meta" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{session.especialidad}</div>
           </div>
           <ChevronDown size={13} style={{ color: 'var(--text-muted)' }} />
         </button>

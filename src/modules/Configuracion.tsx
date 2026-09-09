@@ -156,9 +156,9 @@ export function Configuracion() {
   ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="module-stack" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '0', borderBottom: '1px solid var(--border)' }}>
+      <div className="tabs-scroll" style={{ display: 'flex', gap: '0', borderBottom: '1px solid var(--border)', overflowX: 'auto' }}>
         {tabs.map(t => (
           <button
             key={t.id}
@@ -180,7 +180,7 @@ export function Configuracion() {
       {tab === 'consultorio' && (
         <div className="card" style={cardSt}>
           <h3 style={h3St}>Datos del consultorio</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+          <div className="responsive-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
             <FormField label="Nombre del consultorio">
               <input value={consultorioForm.nombre} onChange={e => setConsultorioForm(f => ({ ...f, nombre: e.target.value }))} style={inpSt} />
             </FormField>
@@ -263,7 +263,7 @@ export function Configuracion() {
       {tab === 'medico' && (
         <div className="card" style={cardSt}>
           <h3 style={h3St}>Datos del médico</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+          <div className="responsive-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
             <FormField label="Nombre completo">
               <input value={medicoForm.nombre} onChange={e => setMedicoForm(f => ({ ...f, nombre: e.target.value }))} style={inpSt} />
             </FormField>
@@ -294,7 +294,7 @@ export function Configuracion() {
 
       {/* Médicos */}
       {tab === 'medicos' && (
-        <div style={{
+        <div className="responsive-grid-2" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
           gap: '16px',
@@ -491,7 +491,7 @@ export function Configuracion() {
         <div className="card" style={cardSt}>
           <h3 style={h3St}>Configuración de agenda</h3>
 
-          <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+          <div className="responsive-toolbar" style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
             <FormField label="Duración default de consulta">
               <select value={agendaForm.duracionDefault} onChange={e => setAgendaForm(f => ({ ...f, duracionDefault: e.target.value }))} style={{ ...inpSt, width: '160px' }}>
                 {['15', '20', '30', '45', '60'].map(v => <option key={v} value={v}>{v} min</option>)}
@@ -619,7 +619,7 @@ export function Configuracion() {
 
       {/* Modal planes */}
       <Modal open={modalPlan} onClose={() => setModalPlan(false)} title="Elegir plan" maxWidth={720}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px' }}>
+        <div className="responsive-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px' }}>
           {planesData.map(p => (
             <div
               key={p.nombre}

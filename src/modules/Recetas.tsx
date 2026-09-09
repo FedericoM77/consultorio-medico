@@ -59,9 +59,9 @@ export function Recetas() {
   const cronicas = recetas.filter(r => r.esCronica);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div className="module-stack" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="responsive-toolbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
         <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>Recetas</h2>
         <Button variant="primary" onClick={() => setModalNuevo(true)}>
           <Plus size={15} /> Nueva receta
@@ -69,7 +69,7 @@ export function Recetas() {
       </div>
 
       {/* Lista de recetas */}
-      <div style={{
+      <div className="card table-card" style={{
         background: 'var(--surface)', border: '1px solid var(--border)',
         borderRadius: '10px', overflow: 'hidden', boxShadow: 'var(--shadow-sm)',
       }}>
@@ -78,11 +78,13 @@ export function Recetas() {
             Todas las recetas ({recetas.length})
           </h3>
         </div>
+        <div className="table-scroll">
         {recetas.map(r => {
           const p = getPaciente(r.pacienteId);
           return (
             <div
               key={r.id}
+              className="recetas-grid"
               style={{
                 display: 'grid', gridTemplateColumns: '100px 1fr 180px auto',
                 alignItems: 'center', gap: '16px',
@@ -123,10 +125,11 @@ export function Recetas() {
         {recetas.length === 0 && (
           <EmptyState title="Sin recetas cargadas" text="Todavía no hay recetas para este consultorio." />
         )}
+        </div>
       </div>
 
       {/* Sección crónicas */}
-      <div style={{
+      <div className="card table-card" style={{
         background: 'var(--surface)', border: '1px solid var(--border)',
         borderRadius: '10px', overflow: 'hidden', boxShadow: 'var(--shadow-sm)',
       }}>
@@ -135,11 +138,13 @@ export function Recetas() {
             Medicación crónica — renovación mensual
           </h3>
         </div>
+        <div className="table-scroll">
         {cronicas.map(r => {
           const p = getPaciente(r.pacienteId);
           return (
             <div
               key={r.id}
+              className="recetas-cronicas-grid"
               style={{
                 display: 'grid', gridTemplateColumns: '1fr auto',
                 alignItems: 'center', gap: '16px',
@@ -163,6 +168,7 @@ export function Recetas() {
         {cronicas.length === 0 && (
           <EmptyState title="Sin medicación crónica" text="Las renovaciones aparecerán cuando cargues recetas crónicas." />
         )}
+        </div>
       </div>
 
       {/* Modal nueva receta */}
@@ -184,7 +190,7 @@ export function Recetas() {
               <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Medicamento {i + 1}
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div className="responsive-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                 <FormField label="Nombre comercial">
                   <input placeholder="Amlodipina" value={med.nombre}
                     onChange={e => { const m = [...form.medicamentos]; m[i].nombre = e.target.value; setForm(f => ({ ...f, medicamentos: m })); }}

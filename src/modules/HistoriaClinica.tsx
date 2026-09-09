@@ -77,10 +77,10 @@ export function HistoriaClinica() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="module-stack" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <div style={{ flex: 1, position: 'relative' }}>
+      <div className="responsive-toolbar" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+        <div className="toolbar-search" style={{ flex: '1 1 260px', position: 'relative', minWidth: 0 }}>
           <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
           <input
             placeholder="Buscar por paciente o diagnóstico…"
@@ -101,8 +101,9 @@ export function HistoriaClinica() {
       </div>
 
       {/* Lista */}
-      <div className="card" style={{ overflow: 'hidden' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '100px 160px 1fr 200px', padding: '10px 20px', borderBottom: '1px solid var(--border)', background: 'var(--surface-raised)' }}>
+      <div className="card table-card" style={{ overflow: 'hidden' }}>
+        <div className="table-scroll">
+        <div className="historia-grid" style={{ display: 'grid', gridTemplateColumns: '100px 160px 1fr 200px', padding: '10px 20px', borderBottom: '1px solid var(--border)', background: 'var(--surface-raised)' }}>
           {['Fecha', 'Paciente', 'Diagnóstico', 'Indicaciones'].map(h => (
             <span key={h} style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</span>
           ))}
@@ -114,7 +115,7 @@ export function HistoriaClinica() {
             <button
               key={c.id}
               onClick={() => { setDetalle(c); setNotasEdit(c.indicaciones); setEditandoNotas(false); }}
-              className="row-hover"
+              className="row-hover historia-grid"
               style={{
                 display: 'grid', gridTemplateColumns: '100px 160px 1fr 200px',
                 padding: '12px 20px', width: '100%', textAlign: 'left',
@@ -134,6 +135,7 @@ export function HistoriaClinica() {
         {filtradas.length === 0 && (
           <EmptyState title="Sin consultas" text={query ? 'No hay resultados para la búsqueda.' : 'Este consultorio todavía no tiene historia clínica cargada.'} />
         )}
+        </div>
       </div>
 
       {/* Modal detalle */}
@@ -247,7 +249,7 @@ export function HistoriaClinica() {
             <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               Examen físico
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+            <div className="responsive-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
               {[
                 { key: 'ta', label: 'TA (mmHg)', placeholder: '120/80' },
                 { key: 'fc', label: 'FC (lpm)', placeholder: '72' },
@@ -267,7 +269,7 @@ export function HistoriaClinica() {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 100px', gap: '10px' }}>
+          <div className="responsive-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 100px', gap: '10px' }}>
             <FormField label="Diagnóstico">
               <input value={form.diagnostico} onChange={e => setForm(f => ({ ...f, diagnostico: e.target.value }))} placeholder="Diagnóstico…" style={inpSt} />
             </FormField>

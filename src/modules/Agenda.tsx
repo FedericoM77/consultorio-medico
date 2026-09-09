@@ -87,10 +87,10 @@ export function Agenda() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="module-stack" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Header del módulo */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', gap: '4px' }}>
+      <div className="agenda-toolbar responsive-toolbar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+        <div className="segmented-actions" style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
           {(['dia', 'semana', 'macro'] as Vista[]).map(v => (
             <button
               key={v}
@@ -109,7 +109,7 @@ export function Agenda() {
           ))}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div className="responsive-toolbar" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <button style={navBtnStyle}><ChevronLeft size={16} /></button>
             <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-primary)', padding: '0 8px' }}>
@@ -224,7 +224,7 @@ export function Agenda() {
             )}
           </FormField>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="responsive-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <FormField label="Hora">
               <input
                 type="time" value={form.hora}

@@ -47,10 +47,10 @@ export function Dashboard() {
   const drawerPaciente = drawerTurno ? getPaciente(drawerTurno.pacienteId) : null;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="module-stack" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
       {/* Metric cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px' }}>
+      <div className="responsive-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px' }}>
         <MetricCard
           icon={<Calendar size={16} style={{ color: 'var(--blue)' }} />}
           label="Turnos hoy"
@@ -89,7 +89,7 @@ export function Dashboard() {
       </div>
 
       {/* Content row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: '14px' }}>
+      <div className="responsive-split" style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: '14px' }}>
 
         {/* Agenda del día */}
         <div className="card" style={{ padding: '20px' }}>

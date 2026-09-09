@@ -116,9 +116,9 @@ export function Pacientes() {
 
   if (fichaPaciente) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div className="module-stack" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         {/* Header ficha */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div className="responsive-toolbar" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
           <button
             onClick={() => setFichaPaciente(null)}
             style={{
@@ -136,13 +136,13 @@ export function Pacientes() {
         </div>
 
         {/* Cabecera paciente */}
-        <div className="card" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '20px' }}>
+        <div className="card patient-profile-card" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
           <Avatar nombre={`${fichaPaciente.nombre} ${fichaPaciente.apellido}`} size={60} />
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: '20px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px', letterSpacing: '-0.02em' }}>
               {fichaPaciente.nombre} {fichaPaciente.apellido}
             </div>
-            <div style={{ display: 'flex', gap: '20px', fontSize: '13px', color: 'var(--text-secondary)' }}>
+            <div style={{ display: 'flex', gap: '20px', fontSize: '13px', color: 'var(--text-secondary)', flexWrap: 'wrap' }}>
               <span>{edad(fichaPaciente.fechaNacimiento)} años</span>
               <span>{fichaPaciente.obraSocial}</span>
               <span>{fichaPaciente.telefono}</span>
@@ -278,7 +278,7 @@ export function Pacientes() {
         )}
 
         {tabFicha === 'datos' && (
-          <div style={{
+          <div className="responsive-form-grid" style={{
             background: 'var(--surface)', border: '1px solid var(--border)',
             borderRadius: '10px', padding: '24px',
             display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px',
@@ -312,9 +312,9 @@ export function Pacientes() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="module-stack" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <div className="pacientes-toolbar responsive-toolbar" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
         <input
           ref={importInputRef}
           type="file"
@@ -322,7 +322,7 @@ export function Pacientes() {
           onChange={handleImportarPacientes}
           style={{ display: 'none' }}
         />
-        <div style={{ flex: 1, position: 'relative' }}>
+        <div className="pacientes-search" style={{ flex: '1 1 260px', position: 'relative', minWidth: 0 }}>
           <Search size={15} style={{
             position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)',
             color: 'var(--text-muted)',
@@ -356,8 +356,9 @@ export function Pacientes() {
       </div>
 
       {/* Tabla */}
-      <div className="card" style={{ overflow: 'hidden' }}>
-        <div style={{
+      <div className="card table-card" style={{ overflow: 'hidden' }}>
+        <div className="table-scroll">
+          <div className="pacientes-grid pacientes-grid-head" style={{
           display: 'grid', gridTemplateColumns: '2fr 60px 140px 120px 80px 40px',
           padding: '10px 20px',
           borderBottom: '1px solid var(--border)',
@@ -368,16 +369,16 @@ export function Pacientes() {
               {h}
             </span>
           ))}
-        </div>
+          </div>
 
-        {filtrados.map(p => {
+          {filtrados.map(p => {
           const consultasP = consultas.filter(c => c.pacienteId === p.id);
           const ultima = consultasP.sort((a, b) => b.fecha.localeCompare(a.fecha))[0];
           return (
             <button
               key={p.id}
               onClick={() => setFichaPaciente(p)}
-              className="row-hover"
+              className="row-hover pacientes-grid"
               style={{
                 display: 'grid', gridTemplateColumns: '2fr 60px 140px 120px 80px 40px',
                 padding: '13px 20px', width: '100%', textAlign: 'left',
@@ -401,16 +402,17 @@ export function Pacientes() {
               <ChevronRight size={16} style={{ color: 'var(--text-muted)' }} />
             </button>
           );
-        })}
-        {filtrados.length === 0 && (
-          <EmptyState text={query ? 'Sin resultados para la búsqueda' : 'Sin pacientes cargados'} />
-        )}
+          })}
+          {filtrados.length === 0 && (
+            <EmptyState text={query ? 'Sin resultados para la búsqueda' : 'Sin pacientes cargados'} />
+          )}
+        </div>
       </div>
 
       {/* Modal nuevo paciente */}
       <Modal open={modalNuevo} onClose={() => setModalNuevo(false)} title="Nuevo paciente">
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="responsive-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <FormField label="Nombre">
               <input placeholder="Juan" value={nuevoForm.nombre} onChange={e => setNuevoForm(f => ({ ...f, nombre: e.target.value }))} style={inputSt} />
             </FormField>
@@ -418,7 +420,7 @@ export function Pacientes() {
               <input placeholder="García" value={nuevoForm.apellido} onChange={e => setNuevoForm(f => ({ ...f, apellido: e.target.value }))} style={inputSt} />
             </FormField>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="responsive-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <FormField label="DNI">
               <input placeholder="12.345.678" value={nuevoForm.dni} onChange={e => setNuevoForm(f => ({ ...f, dni: e.target.value }))} style={inputSt} />
             </FormField>
@@ -429,7 +431,7 @@ export function Pacientes() {
           <FormField label="Obra social">
             <input placeholder="OSDE, Swiss Medical, Particular…" value={nuevoForm.obraSocial} onChange={e => setNuevoForm(f => ({ ...f, obraSocial: e.target.value }))} style={inputSt} />
           </FormField>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="responsive-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <FormField label="Teléfono">
               <input placeholder="11-1234-5678" value={nuevoForm.telefono} onChange={e => setNuevoForm(f => ({ ...f, telefono: e.target.value }))} style={inputSt} />
             </FormField>

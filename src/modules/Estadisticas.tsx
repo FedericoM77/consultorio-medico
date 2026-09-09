@@ -64,9 +64,9 @@ export function Estadisticas() {
   }, {});
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div className="module-stack" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Selector período */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div className="responsive-toolbar" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
         <span style={{ fontSize: '13px', color: 'var(--text-secondary)', marginRight: '4px' }}>Período:</span>
         {(['semana', 'mes', 'trimestre', 'año'] as Periodo[]).map(p => (
           <button
@@ -87,7 +87,7 @@ export function Estadisticas() {
       </div>
 
       {/* 5 métricas */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '12px' }}>
+      <div className="responsive-grid-5" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '12px' }}>
         {[
           { label: 'Consultas', value: m.consultas },
           { label: 'Pacientes únicos', value: m.pacientes },
@@ -107,7 +107,7 @@ export function Estadisticas() {
       </div>
 
       {/* Gráficos */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+      <div className="responsive-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
         <div className="card" style={{ padding: '20px' }}>
           <h3 style={sTitle}>Consultas por día</h3>
           {turnos.length > 0 ? (
@@ -145,7 +145,7 @@ export function Estadisticas() {
       </div>
 
       {/* Top diagnósticos + Heatmap */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+      <div className="responsive-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
         <div className="card" style={{ padding: '20px' }}>
           <h3 style={sTitle}>Top 5 diagnósticos</h3>
           {diagnosticos.length > 0 ? (

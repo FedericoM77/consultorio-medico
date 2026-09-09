@@ -50,19 +50,19 @@ function AppContent() {
 
   return (
     <ClinicDataProvider session={session}>
-      <div style={{ background: 'var(--canvas)', minHeight: '100vh', color: 'var(--text-primary)' }}>
+      <div className="app-shell" style={{ background: 'var(--canvas)', minHeight: '100vh', color: 'var(--text-primary)' }}>
         <Header session={session} onLogout={handleLogout} />
         <Sidebar activo={modulo} onChange={setModulo} />
 
-        <main style={{
+        <main className="app-main" style={{
           marginLeft: '52px',
           marginTop: '48px',
           padding: '28px 32px',
           minHeight: 'calc(100vh - 48px)',
           maxWidth: 'calc(100vw - 52px)',
         }}>
-          <div style={{ marginBottom: '24px' }}>
-            <h1 style={{
+          <div className="module-title-wrap" style={{ marginBottom: '24px' }}>
+            <h1 className="module-title" style={{
               margin: 0, fontSize: '20px', fontWeight: 600,
               color: 'var(--text-primary)', letterSpacing: '-0.03em',
             }}>
@@ -82,26 +82,10 @@ function AppContent() {
           </div>
         </main>
 
-        {/* Mobile bottom nav */}
-        <nav style={{
-          display: 'none',
-          position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 80,
-          background: 'var(--surface)', borderTop: '1px solid var(--border-subtle)',
-          padding: '8px 0',
-        }}
-          className="mobile-nav"
-        >
-          {/* Mobile nav items would go here */}
-        </nav>
-
         <style>{`
           @keyframes fadeIn {
             from { opacity: 0; transform: translateY(4px); }
             to { opacity: 1; transform: translateY(0); }
-          }
-          @media (max-width: 768px) {
-            .mobile-nav { display: flex !important; }
-            main { margin-bottom: 60px; padding: 16px; }
           }
         `}</style>
       </div>

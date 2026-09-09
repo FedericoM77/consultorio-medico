@@ -62,9 +62,9 @@ export function Facturacion() {
   const getPaciente = (id: string) => pacientes.find(p => p.id === id);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div className="module-stack" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Métricas header */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px' }}>
+      <div className="responsive-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px' }}>
         <MetricCard icon={<DollarSign size={15} style={{ color: 'var(--green)' }} />} label="Total cobrado mes" value={`$${totalMes.toLocaleString('es-AR')}`} iconClass="icon-g" glowClass="glow-g" />
         <MetricCard icon={<TrendingUp size={15} style={{ color: 'var(--amber)' }} />} label="Pendiente de cobro" value={`$${pendiente.toLocaleString('es-AR')}`} iconClass="icon-a" glowClass="glow-a" />
         <MetricCard icon={<Users size={15} style={{ color: 'var(--blue)' }} />} label="Consultas" value={String(totalConsultas)} iconClass="icon-b" glowClass="glow-b" />
@@ -72,7 +72,7 @@ export function Facturacion() {
       </div>
 
       {/* Gráficos */}
-      <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: '14px' }}>
+      <div className="responsive-split" style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: '14px' }}>
         <div className="card" style={{ padding: '20px' }}>
           <h3 style={sectionTitle}>Ingresos — últimos 30 días</h3>
           {lineData.length > 0 ? (
@@ -113,8 +113,8 @@ export function Facturacion() {
       </div>
 
       {/* Tabla movimientos */}
-      <div className="card" style={{ overflow: 'hidden' }}>
-        <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '12px', background: 'var(--surface-raised)' }}>
+      <div className="card table-card" style={{ overflow: 'hidden' }}>
+        <div className="responsive-toolbar" style={{ padding: '14px 20px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '12px', background: 'var(--surface-raised)', flexWrap: 'wrap' }}>
           <h3 style={{ ...sectionTitle, flex: 1 }}>Movimientos</h3>
           {(['todos', 'cobrado', 'pendiente', 'a-facturar'] as FiltroEstado[]).map(f => (
             <button
@@ -132,7 +132,8 @@ export function Facturacion() {
           ))}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr 140px 100px 100px 80px', padding: '8px 20px', borderBottom: '1px solid var(--border)' }}>
+        <div className="table-scroll">
+        <div className="billing-grid" style={{ display: 'grid', gridTemplateColumns: '100px 1fr 140px 100px 100px 80px', padding: '8px 20px', borderBottom: '1px solid var(--border)' }}>
           {['Fecha', 'Paciente', 'Obra social', 'Monto', 'Estado', ''].map(h => (
             <span key={h} style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</span>
           ))}
@@ -143,7 +144,7 @@ export function Facturacion() {
           return (
             <div
               key={c.id}
-              className="row-hover"
+              className="row-hover billing-grid"
               style={{
                 display: 'grid', gridTemplateColumns: '100px 1fr 140px 100px 100px 80px',
                 padding: '12px 20px', borderBottom: '1px solid var(--border-subtle)', alignItems: 'center',
@@ -174,16 +175,19 @@ export function Facturacion() {
         {filtrados.length === 0 && (
           <EmptyState title="Sin movimientos" text="Este consultorio no tiene cobros cargados." />
         )}
+        </div>
       </div>
 
       {/* Liquidaciones */}
-      <div className="card" style={{ overflow: 'hidden' }}>
+      <div className="card table-card" style={{ overflow: 'hidden' }}>
         <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border)', background: 'var(--surface-raised)' }}>
           <h3 style={sectionTitle}>Liquidaciones obras sociales — Junio 2026</h3>
         </div>
+        <div className="table-scroll">
         {liquidaciones.map(l => (
           <div
             key={l.os}
+            className="liquidaciones-grid"
             style={{
               display: 'grid', gridTemplateColumns: '1fr 80px 120px 120px',
               padding: '12px 20px', borderBottom: '1px solid var(--border-subtle)', alignItems: 'center',
@@ -200,6 +204,7 @@ export function Facturacion() {
         {liquidaciones.length === 0 && (
           <EmptyState title="Sin liquidaciones" text="No hay obras sociales para liquidar todavía." />
         )}
+        </div>
       </div>
 
       <Toast toasts={toasts} onRemove={removeToast} />
