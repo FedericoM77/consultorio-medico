@@ -16,12 +16,31 @@ export interface Paciente {
 export interface Turno {
   id: string;
   pacienteId: string;
+  medicoId?: string;
   fecha: string;
   hora: string;
   duracion: 15 | 30 | 45 | 60;
   motivo: string;
   estado: 'confirmado' | 'pendiente' | 'en-consultorio' | 'cancelado' | 'atendido';
   obraSocial: string;
+}
+
+export interface HorarioAtencion {
+  dia: string;
+  desde: string;
+  hasta: string;
+  activo: boolean;
+}
+
+export interface Medico {
+  id: string;
+  nombre: string;
+  especialidad: string;
+  matricula: string;
+  email: string;
+  telefono: string;
+  color: string;
+  horarios: HorarioAtencion[];
 }
 
 export interface Consulta {
