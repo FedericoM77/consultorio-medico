@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import type { Cobro, Consulta, HorarioAtencion, Medico, Paciente, Receta, Turno } from '../types';
 import type { AuthSession } from '../modules/Auth';
 import {
@@ -30,6 +30,8 @@ interface ClinicData {
   cobros: Cobro[];
   medicoInfo: MedicoInfo;
   medicos: Medico[];
+  logoUrl: string | null;
+  setLogoUrl: (logoUrl: string | null) => void;
   addMedico: (medico: Omit<Medico, 'id'>) => void;
   updateMedicoHorarios: (medicoId: string, horarios: HorarioAtencion[]) => void;
 }
@@ -103,6 +105,16 @@ function assignMedicosToTurnos(turnos: Turno[], medicos: Medico[]) {
   }));
 }
 
+function readStoredLogo(storageKey: string) {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    return window.localStorage.getItem(storageKey);
+  } catch {
+    return null;
+  }
+}
+
 function medicoInfoFromSession(session: AuthSession): MedicoInfo {
   return {
     nombre: session.medico,
@@ -144,10 +156,28 @@ export function ClinicDataProvider({ session, children }: { session: AuthSession
   }, [session]);
 
   const [medicos, setMedicos] = useState<Medico[]>(initialData.medicos);
+  const logoStorageKey = `consultorio-logo:${session.email}`;
+  const [logoUrl, setLogoUrlState] = useState<string | null>(() => readStoredLogo(logoStorageKey));
+
+  const setLogoUrl = useCallback((nextLogoUrl: string | null) => {
+    setLogoUrlState(nextLogoUrl);
+
+    try {
+      if (nextLogoUrl) {
+        window.localStorage.setItem(logoStorageKey, nextLogoUrl);
+      } else {
+        window.localStorage.removeItem(logoStorageKey);
+      }
+    } catch {
+      setLogoUrlState(nextLogoUrl);
+    }
+  }, [logoStorageKey]);
 
   const value = useMemo<ClinicData>(() => ({
     ...initialData,
     medicos,
+    logoUrl,
+    setLogoUrl,
     addMedico: (medico) => {
       setMedicos(prev => [...prev, { ...medico, id: createMedicoId(medico.nombre) }]);
     },
@@ -156,7 +186,7 @@ export function ClinicDataProvider({ session, children }: { session: AuthSession
         medico.id === medicoId ? { ...medico, horarios } : medico
       )));
     },
-  }), [initialData, medicos]);
+  }), [initialData, logoUrl, medicos, setLogoUrl]);
 
   return (
     <ClinicDataContext.Provider value={value}>

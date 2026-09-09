@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Clock, Plus, UserRound } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { Clock, Image as ImageIcon, Plus, Trash2, Upload, UserRound } from 'lucide-react';
 import { createDefaultHorarios, DIAS_ATENCION, useClinicData } from '../context/ClinicDataContext';
 import { Button } from '../components/ui/Button';
 import { Modal } from '../components/ui/Modal';
@@ -28,9 +28,10 @@ const planesData = [
 ];
 
 export function Configuracion() {
-  const { medicoInfo, medicos, addMedico, updateMedicoHorarios } = useClinicData();
+  const { medicoInfo, medicos, logoUrl, setLogoUrl, addMedico, updateMedicoHorarios } = useClinicData();
   const [tab, setTab] = useState<TabConf>('consultorio');
   const [modalPlan, setModalPlan] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement | null>(null);
   const { toasts, addToast, removeToast } = useToast();
 
   const [consultorioForm, setConsultorioForm] = useState({
@@ -59,6 +60,7 @@ export function Configuracion() {
   });
 
   const [nuevoMedico, setNuevoMedico] = useState(NUEVO_MEDICO_INICIAL);
+  const [logoNombre, setLogoNombre] = useState('');
 
   const [horariosActivos, setHorariosActivos] = useState<Record<string, Set<string>>>(
     Object.fromEntries(DIAS_SEMANA.map(d => [d, new Set<string>(
@@ -77,6 +79,37 @@ export function Configuracion() {
 
   function handleGuardar() {
     addToast('Configuración guardada', 'success');
+  }
+
+  function handleLogoChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      addToast('Subí un archivo de imagen válido', 'error');
+      return;
+    }
+
+    if (file.size > 1_500_000) {
+      addToast('Usá una imagen de hasta 1.5 MB', 'error');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setLogoUrl(String(reader.result));
+      setLogoNombre(file.name);
+      addToast('Logo actualizado', 'success');
+    };
+    reader.onerror = () => addToast('No se pudo leer el logo', 'error');
+    reader.readAsDataURL(file);
+  }
+
+  function handleQuitarLogo() {
+    setLogoUrl(null);
+    setLogoNombre('');
+    if (logoInputRef.current) logoInputRef.current.value = '';
+    addToast('Logo quitado', 'info');
   }
 
   function handleAgregarMedico() {
@@ -161,14 +194,64 @@ export function Configuracion() {
           <FormField label="Dirección">
             <input value={consultorioForm.direccion} onChange={e => setConsultorioForm(f => ({ ...f, direccion: e.target.value }))} style={inpSt} />
           </FormField>
-          <FormField label="Logo">
-            <button style={{
-              background: 'var(--surface-raised)', border: '2px dashed var(--border)',
-              borderRadius: '8px', padding: '20px', cursor: 'pointer',
-              fontSize: '12px', color: 'var(--text-secondary)', fontFamily: 'inherit',
+          <FormField label="Logo del encabezado">
+            <input
+              ref={logoInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/svg+xml"
+              onChange={handleLogoChange}
+              style={{ display: 'none' }}
+            />
+            <div style={{
+              background: 'var(--surface-raised)',
+              border: '1px solid var(--border)',
+              borderRadius: '8px',
+              padding: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '14px',
             }}>
-              + Subir logo del consultorio (simulado)
-            </button>
+              <div style={{
+                width: '58px',
+                height: '58px',
+                borderRadius: '12px',
+                border: '1px solid var(--border)',
+                background: 'var(--surface)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+                flexShrink: 0,
+              }}>
+                {logoUrl ? (
+                  <img
+                    src={logoUrl}
+                    alt="Logo del consultorio"
+                    style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '6px', boxSizing: 'border-box' }}
+                  />
+                ) : (
+                  <ImageIcon size={22} color="var(--text-muted)" />
+                )}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '3px' }}>
+                  {logoNombre || (logoUrl ? 'Logo cargado' : 'Sin logo cargado')}
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                  PNG, JPG, WebP o SVG · hasta 1.5 MB
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                <Button type="button" variant="secondary" onClick={() => logoInputRef.current?.click()}>
+                  <Upload size={14} /> Subir
+                </Button>
+                {logoUrl && (
+                  <Button type="button" variant="ghost" onClick={handleQuitarLogo}>
+                    <Trash2 size={14} /> Quitar
+                  </Button>
+                )}
+              </div>
+            </div>
           </FormField>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button variant="primary" onClick={handleGuardar}>Guardar cambios</Button>

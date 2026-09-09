@@ -1,6 +1,7 @@
 import React from 'react';
 import { LogOut, Moon, Sun, Bell, ChevronDown } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import { useClinicData } from '../../context/ClinicDataContext';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import type { AuthSession } from '../../modules/Auth';
@@ -12,6 +13,7 @@ interface HeaderProps {
 
 export function Header({ session, onLogout }: HeaderProps) {
   const { theme, toggleTheme } = useTheme();
+  const { logoUrl } = useClinicData();
   const today = format(new Date(), "d MMM yyyy", { locale: es });
 
   return (
@@ -29,15 +31,26 @@ export function Header({ session, onLogout }: HeaderProps) {
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         <div style={{
           width: 28, height: 28, borderRadius: '8px',
-          background: 'var(--blue)',
+          background: logoUrl ? 'var(--surface-raised)' : 'var(--blue)',
+          border: logoUrl ? '1px solid var(--border)' : 'none',
+          padding: logoUrl ? 2 : 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           flexShrink: 0,
+          overflow: 'hidden',
         }}>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M8 2.5C5 2.5 3 5 3 7.5c0 3 2.5 5 5 5s5-2 5-5C13 5 11 2.5 8 2.5z" fill="white" opacity="0.9"/>
-            <rect x="7" y="5" width="2" height="5" rx="1" fill="white"/>
-            <rect x="5.5" y="9" width="5" height="2" rx="1" fill="white"/>
-          </svg>
+          {logoUrl ? (
+            <img
+              src={logoUrl}
+              alt={`Logo ${session.consultorio}`}
+              style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '6px' }}
+            />
+          ) : (
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 2.5C5 2.5 3 5 3 7.5c0 3 2.5 5 5 5s5-2 5-5C13 5 11 2.5 8 2.5z" fill="white" opacity="0.9"/>
+              <rect x="7" y="5" width="2" height="5" rx="1" fill="white"/>
+              <rect x="5.5" y="9" width="5" height="2" rx="1" fill="white"/>
+            </svg>
+          )}
         </div>
         <div>
           <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
