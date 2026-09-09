@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Search, Plus, ChevronRight } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { Search, Plus, ChevronRight, Download, FileUp, FileSpreadsheet } from 'lucide-react';
 import { useClinicData } from '../context/ClinicDataContext';
 import { Paciente } from '../types';
 import { Avatar } from '../components/ui/Avatar';
@@ -13,6 +13,7 @@ type TabFicha = 'historia' | 'recetas' | 'cobros' | 'datos';
 export function Pacientes() {
   const { pacientes: pacientesIniciales, consultas, recetas, cobros } = useClinicData();
   const [pacientes, setPacientes] = useState(pacientesIniciales);
+  const importInputRef = useRef<HTMLInputElement | null>(null);
   const [query, setQuery] = useState('');
   const [fichaPaciente, setFichaPaciente] = useState<Paciente | null>(null);
   const [modalNuevo, setModalNuevo] = useState(false);
@@ -51,6 +52,62 @@ export function Pacientes() {
     setPacientes(prev => [...prev, nuevo]);
     setModalNuevo(false);
     setNuevoForm({ nombre: '', apellido: '', dni: '', fechaNacimiento: '', obraSocial: '', telefono: '', email: '' });
+  }
+
+  function descargarCsv(nombreArchivo: string, filas: string[][]) {
+    const csv = filas.map(fila => fila.map(escapeCsvCell).join(';')).join('\n');
+    const blob = new Blob([`\ufeff${csv}`], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = nombreArchivo;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  function handleExportarPacientes() {
+    descargarCsv('pacientes-consultorio.csv', [
+      columnasPacientes,
+      ...pacientes.map(p => [
+        p.nombre,
+        p.apellido,
+        p.dni,
+        p.fechaNacimiento,
+        p.obraSocial,
+        p.nroAfiliado || '',
+        p.telefono,
+        p.email || '',
+        p.antecedentes.join(', '),
+        p.alergias.join(', '),
+        p.medicacionCronica.join(', '),
+      ]),
+    ]);
+  }
+
+  function handleDescargarEjemplo() {
+    descargarCsv('ejemplo-importacion-pacientes.csv', [
+      columnasPacientes,
+      ['Ana', 'Martínez', '30111222', '1984-03-14', 'OSDE 210', '123456789', '11-4567-1234', 'ana.martinez@email.com', 'Hipertensión', 'Penicilina', 'Losartán 50mg'],
+      ['Juan', 'Pérez', '28777888', '1979-08-22', 'Particular', '', '11-5555-2020', 'juan.perez@email.com', '', '', ''],
+      ['Sofía', 'Herrera', '40999888', '1995-12-05', 'Swiss Medical', 'SM-778899', '11-6010-3344', '', 'Asma leve', 'Ibuprofeno', 'Salbutamol'],
+    ]);
+  }
+
+  function handleImportarPacientes(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const filas = parseCsv(String(reader.result));
+      const nuevos = filas.slice(1).map((fila, index) => pacienteDesdeFila(fila, index)).filter(Boolean) as Paciente[];
+      if (nuevos.length === 0) return;
+      setPacientes(prev => [...prev, ...nuevos]);
+      if (importInputRef.current) importInputRef.current.value = '';
+    };
+    reader.readAsText(file, 'utf-8');
   }
 
   const consultasPaciente = fichaPaciente ? consultas.filter(c => c.pacienteId === fichaPaciente.id) : [];
@@ -258,6 +315,13 @@ export function Pacientes() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <input
+          ref={importInputRef}
+          type="file"
+          accept=".csv,text/csv"
+          onChange={handleImportarPacientes}
+          style={{ display: 'none' }}
+        />
         <div style={{ flex: 1, position: 'relative' }}>
           <Search size={15} style={{
             position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)',
@@ -277,6 +341,15 @@ export function Pacientes() {
             }}
           />
         </div>
+        <Button variant="secondary" onClick={handleDescargarEjemplo}>
+          <FileSpreadsheet size={15} /> Ejemplo Excel
+        </Button>
+        <Button variant="secondary" onClick={() => importInputRef.current?.click()}>
+          <FileUp size={15} /> Importar Excel
+        </Button>
+        <Button variant="secondary" onClick={handleExportarPacientes}>
+          <Download size={15} /> Exportar pacientes
+        </Button>
         <Button variant="primary" onClick={() => setModalNuevo(true)}>
           <Plus size={15} /> Nuevo paciente
         </Button>
@@ -410,3 +483,86 @@ const inputSt: React.CSSProperties = {
   fontSize: '13px', color: 'var(--text-primary)',
   fontFamily: 'inherit', outline: 'none', width: '100%', boxSizing: 'border-box',
 };
+
+const columnasPacientes = [
+  'nombre',
+  'apellido',
+  'dni',
+  'fechaNacimiento',
+  'obraSocial',
+  'nroAfiliado',
+  'telefono',
+  'email',
+  'antecedentes',
+  'alergias',
+  'medicacionCronica',
+];
+
+function escapeCsvCell(value: string) {
+  const cell = value ?? '';
+  return /[;"\n]/.test(cell) ? `"${cell.replace(/"/g, '""')}"` : cell;
+}
+
+function parseCsv(text: string) {
+  const firstLine = text.split(/\r?\n/)[0] || '';
+  const delimiter = firstLine.includes(';') ? ';' : ',';
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let cell = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i += 1) {
+    const char = text[i];
+    const next = text[i + 1];
+
+    if (char === '"' && inQuotes && next === '"') {
+      cell += '"';
+      i += 1;
+    } else if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === delimiter && !inQuotes) {
+      row.push(cell.trim());
+      cell = '';
+    } else if ((char === '\n' || char === '\r') && !inQuotes) {
+      if (char === '\r' && next === '\n') i += 1;
+      row.push(cell.trim());
+      if (row.some(Boolean)) rows.push(row);
+      row = [];
+      cell = '';
+    } else {
+      cell += char;
+    }
+  }
+
+  row.push(cell.trim());
+  if (row.some(Boolean)) rows.push(row);
+
+  return rows;
+}
+
+function pacienteDesdeFila(fila: string[], index: number): Paciente | null {
+  const [nombre, apellido, dni, fechaNacimiento, obraSocial, nroAfiliado, telefono, email, antecedentes, alergias, medicacionCronica] = fila;
+  if (!nombre || !apellido) return null;
+
+  return {
+    id: `p-import-${Date.now()}-${index}`,
+    nombre,
+    apellido,
+    dni: dni || '',
+    fechaNacimiento: fechaNacimiento || '1990-01-01',
+    obraSocial: obraSocial || 'Particular',
+    nroAfiliado: nroAfiliado || undefined,
+    telefono: telefono || '',
+    email: email || undefined,
+    antecedentes: splitList(antecedentes),
+    alergias: splitList(alergias),
+    medicacionCronica: splitList(medicacionCronica),
+  };
+}
+
+function splitList(value?: string) {
+  return (value || '')
+    .split(',')
+    .map(item => item.trim())
+    .filter(Boolean);
+}
